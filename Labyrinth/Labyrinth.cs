@@ -27,8 +27,28 @@ namespace Labyrinth
                     };
                 }
             }
+
+            // Association des clés de porte aux Room adjacentes
+            for (var y = 0; y < Height; y++)
+            for (var x = 0; x < Width; x++)
+            {
+                if (Tiles[y, x] is Door door)
+                {
+                    (int dx, int dy)[] dirs = { (-1,0), (1,0), (0,-1), (0,1) };
+                    foreach (var (dx, dy) in dirs)
+                    {
+                        int nx = x + dx, ny = y + dy;
+                        if (nx >= 0 && nx < Width && ny >= 0 && ny < Height && Tiles[ny, nx] is Room room && room.Item == null)
+                        {
+                            room.Item = door.Key;
+                            break;
+                        }
+                    }
+                }
+            }
         }
+
+        public Tile GetTileAt(int x, int y) => Tiles[y, x];
 
     }
 }
-
