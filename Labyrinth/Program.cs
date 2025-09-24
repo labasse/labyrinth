@@ -18,6 +18,8 @@ class Program
         var labyrinth = new Labyrinth.Labyrinth(map.Trim());
 
         Console.WriteLine($"Labyrinthe {labyrinth.Width}x{labyrinth.Height}\n");
+        
+        Console.WriteLine(labyrinth.ToString());
 
         for (int y = 0; y < labyrinth.Height; y++)
         {

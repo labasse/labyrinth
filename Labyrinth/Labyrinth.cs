@@ -31,4 +31,32 @@ public class Labyrinth
             }
         }
     }
+
+    public override string ToString()
+    {
+        var result = new System.Text.StringBuilder();
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var tile = Tiles[y, x];
+                char c = tile switch
+                {
+                    Wall => Tiles[y, x] is Wall ? GetWallChar(y, x) : '#',
+                    Room r when r.Item is Key => 'k',
+                    Room => ' ',
+                    Door => '/',
+                    _ => '?'
+                };
+                result.Append(c);
+            }
+            result.AppendLine();
+        }
+        return result.ToString();
+    }
+
+    private char GetWallChar(int y, int x)
+    {
+        return '+';
+    }
 }
