@@ -47,8 +47,6 @@ namespace Labyrinth
                 }
             }
         }
-
-        public Tile GetTileAt(int x, int y) => Tiles[y, x];
-
+        
     }
 }
