@@ -4,7 +4,7 @@ namespace Labyrinth;
 public class Labyrinth
 {
     public Tile[,] Tiles { get; set; }
-    public int Width { get;}
+    public int Width { get; }
     public int Height { get; }
 
     public Labyrinth(string map)
@@ -12,11 +12,11 @@ public class Labyrinth
         var lines = map.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         Height = lines.Length;
         Width = lines[0].Length;
-        Tiles = new Tile[Width, Height];
+        Tiles = new Tile[Height, Width];
 
         for (int y = 0; y < Height; y++)
         {
-            var line = lines[y];
+            var line = lines[y].PadRight(Width, ' ');
             for (int x = 0; x < Width; x++)
             {
                 char c = line[x];
