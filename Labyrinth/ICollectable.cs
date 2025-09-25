@@ -1,3 +1,3 @@
-interface ICollectable
+public interface ICollectable
 {
 }

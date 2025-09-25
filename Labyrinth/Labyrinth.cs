@@ -6,7 +6,8 @@ public class Labyrinth
         String[] tab = s.Split('\n');
         grid = new Tile[tab.Length][];
         Key[] trousseau = new Key[5];
-        int id = 0;
+        int lenght = 0;
+        int fifoIndexTrousseau = 0;
         for (int i = 0; i < tab.Length; i++)
         {
             grid[i] = new Tile[tab[i].Length];
@@ -20,13 +21,33 @@ public class Labyrinth
                 {
                     grid[i][j] = new Room();
                 }
-                else
+                else if (tab[i][j] == '/')
                 {
                     grid[i][j] = new Door();
-                    trousseau[id] = new Key("2");
-                    id += 1;
+                    trousseau[lenght] = new Key("2");
+                    lenght += 1;
+                }
+                else
+                {
+                    Room r = new Room();
+                    r.Item = trousseau[fifoIndexTrousseau];
+                    fifoIndexTrousseau += 1;
+                    grid[i][j]= r;
                 }
             }
         }
+    }
+    public String toString()
+    {
+        String res = "";
+        for (int i = 0; i < grid.Length; i++)
+        {
+            for (int j = 0; j < grid[i].Length; j++)
+            {
+                res += grid[i][j].Character;
+            }
+            res += "\n";
+        }
+        return res;
     }
 }

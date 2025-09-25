@@ -18,6 +18,6 @@ class Program
 
         Labyrinth labyrinth = new Labyrinth(labyString);
 
-        Console.WriteLine("Labyrinthe instancié avec succès !");
+        Console.WriteLine(labyrinth.toString());
     }
 }

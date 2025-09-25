@@ -3,6 +3,7 @@ public class Door : Tile
     private Key myKey;
     private bool isOpened = false;
     public override bool IsTraversable { get { return isOpened; } }
+    public override String Character { get { return "/"; } }
     public override void Pass()
     {
         // Logic for passing through a room
