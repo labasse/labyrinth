@@ -7,37 +7,51 @@ public class Labyrinth
 {
     private int Width { get; }
     private int Height { get; }
-    
-    public Tile.Tile[][] Tiles { get; }
+
+    private Tile.Tile[][] Tiles { get; set; }
     
     public Labyrinth(string labyrinth)
     {
         Key key = new Key(Guid.NewGuid());
         string[] rows = labyrinth.Split('\n');
-        Width = rows.Length;
-        Height = rows[0].Length;
+        Width = rows[0].Length;
+        Height = rows.Length;
+        Console.WriteLine($"Width={Width}, Height={Height}");
+        InitLab();
         for (var i = 0; i < Height; i++)
         {
+            Console.Write("\n");
             string row = rows[i];
-            Console.WriteLine($"Ligne {i + 1}");
             for (var j = 0; j < row.Length; j++)
             {
+                Console.Write(row[j]);
                 switch (row[j])
                 {
                     case ' ':
-                        Tiles[j][i] = new Room(null);
+                        Tiles[i][j] = new Room(null);
                         break;
                     case 'k':
-                        Tiles[j][i] = new Room(key);
+                        Tiles[i][j] = new Room(key);
                         break;
                     case '/':
-                        Tiles[j][i] = new Door(key);
+                        Tiles[i][j] = new Door(key);
                         break;
                     default:
-                        Tiles[j][i] = new Wall();
+                        Tiles[i][j] = new Wall();
                         break;
                 }
             }
+        }
+        Console.WriteLine();
+    }
+
+    private void InitLab()
+    {
+        // Création du tableau en "jagged array"
+        Tiles = new Tile.Tile[Height][];
+        for (int i = 0; i < Height; i++)
+        {
+            Tiles[i] = new Tile.Tile[Width];
         }
     }
 }
