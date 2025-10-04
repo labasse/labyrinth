@@ -6,4 +6,3 @@ namespace Labyrinth
         public override void Pass() => throw new System.InvalidOperationException("Cannot pass through a wall.");
     }
 }
-

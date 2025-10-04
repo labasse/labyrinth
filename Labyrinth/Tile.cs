@@ -6,4 +6,3 @@ namespace Labyrinth
         public abstract void Pass();
     }
 }
-
