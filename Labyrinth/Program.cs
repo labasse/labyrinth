@@ -1,2 +1,16 @@
 ﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+var multiline = """
+        +--+--------+
+        |  /        |
+        |  +--+--+  |
+        |     |k    |
+        +--+  |  +--+
+        |  |k       |
+        +  +-------/|
+        |           |
+        +-----------+
+        """;
+
+var labyrinth = new Labyrinth.Labyrinth(multiline);
+
+Console.WriteLine(labyrinth);
