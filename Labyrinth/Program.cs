@@ -18,6 +18,6 @@ class Program
 
         Labyrinth labyrinth = new Labyrinth(labyString);
 
-        Console.WriteLine(labyrinth.toString());
+        Console.WriteLine(labyrinth.ToString());
     }
 }

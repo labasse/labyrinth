@@ -1,53 +1,55 @@
+using System.Linq;
+using System.Text;
+
 public class Labyrinth
 {
-    private Tile[][] grid;
+    private Tile[,] grid;
     public Labyrinth(string s)
     {
         String[] tab = s.Split('\n');
-        grid = new Tile[tab.Length][];
+        grid = new Tile[tab.Length, tab[0].Length];
         Key[] trousseau = new Key[5];
         int lenght = 0;
         int fifoIndexTrousseau = 0;
         for (int i = 0; i < tab.Length; i++)
         {
-            grid[i] = new Tile[tab[i].Length];
             for (int j = 0; j < tab[i].Length; j++)
             {
                 if (tab[i][j] == '#')
                 {
-                    grid[i][j] = new Wall();
+                    grid[i,j] = new Wall();
                 }
                 else if (tab[i][j] == ' ')
                 {
-                    grid[i][j] = new Room();
+                    grid[i,j] = new Room();
                 }
                 else if (tab[i][j] == '/')
                 {
-                    grid[i][j] = new Door();
-                    trousseau[lenght] = new Key("2");
-                    lenght += 1;
+                    grid[i,j] = new Door();
+                    trousseau[lenght] = new Key();
+                    lenght++;
                 }
                 else
                 {
                     Room r = new Room();
                     r.Item = trousseau[fifoIndexTrousseau];
-                    fifoIndexTrousseau += 1;
-                    grid[i][j]= r;
+                    fifoIndexTrousseau ++;
+                    grid[i,j]= r;
                 }
             }
         }
     }
-    public String toString()
+    public override string ToString()
     {
-        String res = "";
-        for (int i = 0; i < grid.Length; i++)
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < grid.GetLength(0); i++)
         {
-            for (int j = 0; j < grid[i].Length; j++)
+            for (int j = 0; j < grid.GetLength(1); j++)
             {
-                res += grid[i][j].Character;
+                res.Append(grid[i, j].Character);
             }
-            res += "\n";
+            res.Append('\n');
         }
-        return res;
+        return res.ToString();
     }
 }

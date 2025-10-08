@@ -8,7 +8,7 @@ public class Door : Tile
     {
         // Logic for passing through a room
     }
-    public void open(Key key)
+    public void openDoor(Key key)
     {
         if(myKey == key)
         {
@@ -22,6 +22,6 @@ public class Door : Tile
 
     public Door()
     {
-        this.myKey = new Key("2");
+        this.myKey = new Key();
     }
 }
