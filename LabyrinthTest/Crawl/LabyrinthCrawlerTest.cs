@@ -127,7 +127,18 @@ public class LabyrinthCrawlerTest
     [Test]
     public void TurnLeftFacesWestTile()
     {
-        Assert.That(false);
+        var laby = new Labyrinth.Labyrinth("""
+                +--+
+                |x |
+                +--+
+                """);
+        var crawler = laby.NewCrawler();
+        crawler.Direction.TurnLeft();
+        using var all = Assert.EnterMultipleScope();
+        Assert.That(crawler.X, Is.EqualTo(1));
+        Assert.That(crawler.Y, Is.EqualTo(1));
+        Assert.That(crawler.Direction, Is.EqualTo(Direction.West));
+        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
     }
 
     [Test]
