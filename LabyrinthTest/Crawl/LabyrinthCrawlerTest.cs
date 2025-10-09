@@ -15,14 +15,14 @@ public class LabyrinthCrawlerTest
                 | x|
                 +--+
                 """);
-        var test = laby.NewCrawler();
+        var crawler = laby.NewCrawler();
 
         using var all = Assert.EnterMultipleScope();
 
-        Assert.That(test.X, Is.EqualTo(2));
-        Assert.That(test.Y, Is.EqualTo(1));
-        Assert.That(test.Direction, Is.EqualTo(Direction.North));
-        Assert.That(test.FacingTile, Is.TypeOf<Wall>());
+        Assert.That(crawler.X, Is.EqualTo(2));
+        Assert.That(crawler.Y, Is.EqualTo(1));
+        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
+        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
     }
 
     [Test]
@@ -33,12 +33,12 @@ public class LabyrinthCrawlerTest
                 |x x|
                 +---+
                 """);
-        var test = laby.NewCrawler();
+        var crawler = laby.NewCrawler();
         using var all = Assert.EnterMultipleScope();
-        Assert.That(test.X, Is.EqualTo(3));
-        Assert.That(test.Y, Is.EqualTo(1));
-        Assert.That(test.Direction, Is.EqualTo(Direction.North));
-        Assert.That(test.FacingTile, Is.TypeOf<Wall>());
+        Assert.That(crawler.X, Is.EqualTo(3));
+        Assert.That(crawler.Y, Is.EqualTo(1));
+        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
+        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
     }
 
     [Test]
@@ -57,7 +57,18 @@ public class LabyrinthCrawlerTest
     [Test]
     public void FacingNorthOnUpperTileReturnsOutside()
     {
-        Assert.That(false);
+        var laby = new Labyrinth.Labyrinth("""
+                +--+
+                | x|
+                +--+
+                """);
+        var crawler = laby.NewCrawler();
+        crawler.Walk();
+        using var all = Assert.EnterMultipleScope();
+        Assert.That(crawler.X, Is.EqualTo(2));
+        Assert.That(crawler.Y, Is.EqualTo(0));
+        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
+        Assert.That(crawler.FacingTile, Is.TypeOf<Outside>());
     }
 
     [Test]
