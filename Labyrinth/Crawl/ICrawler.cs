@@ -32,6 +32,7 @@ namespace Labyrinth.Crawl
         /// Pass the tile in front of the crawler and move into it.
         /// </summary>
         /// <returns>An inventory of the collectable items in the place reached.</returns>
+        /// <exception cref="Tile.Pass">Thrown when the tile cannot be passed.</exception>
         Inventory Walk();
     }
 }
