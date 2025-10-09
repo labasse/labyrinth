@@ -4,29 +4,40 @@ using Labyrinth.Tiles;
 
 namespace Labyrinth.Crawl
 {
-    public class Crawler : ICrawler
+    /// <summary>
+    /// Creates a new crawler at the given starting position, facing north.
+    /// </summary>
+    /// <param name="tiles">The tile map.</param>
+    /// <param name="startX">The starting X position.</param>
+    /// <param name="startY">The starting Y position.</param>
+    public class Crawler(Tile[,] tiles, Point start) : ICrawler
     {
-        public int X { get; private set; }
-        public int Y { get; private set; }
+        private Point Position { get; set; } = start;
 
-        public Direction Direction { get; private set; }
+        public Direction Direction { get; private set; } = Direction.North;
 
-        public Tile FacingTile { get; private set; }
+        public Tile FacingTile
+        {
+            get
+            {
+                var front = Position + Direction;
+                if (front.X < 0 || front.Y < 0 || front.X >= _tiles.GetLength(0) || front.Y >= _tiles.GetLength(1))
+                {
+                    return Outside.Singleton;
+                }
+                return _tiles[front.X, front.Y];
+            }
+        }
 
-        private readonly Tile[,] _tiles;
+        public int X => Position.X;
+
+        public int Y => Position.Y;
+
+        private readonly Tile[,] _tiles = tiles;
 
         public Inventory Walk()
         {
             throw new NotImplementedException();
-        }
-
-        public Crawler(Tile[,] tiles, int startX, int startY)
-        {
-            _tiles = tiles;
-            X = startX;
-            Y = startY;
-            Direction = Direction.North;
-            FacingTile = _tiles[X + Direction.DeltaX, Y + Direction.DeltaY];
         }
     }
 }

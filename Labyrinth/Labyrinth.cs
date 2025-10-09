@@ -6,9 +6,7 @@ namespace Labyrinth
 {
     public class Labyrinth
     {
-
-        private int StartX { get; init; }
-        private int StartY { get; init; }
+        private Point Start;
 
         /// <summary>
         /// Labyrinth with walls, doors and collectable items.
@@ -18,9 +16,7 @@ namespace Labyrinth
         /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
         public Labyrinth(string ascii_map)
         {
-            _tiles = Build.AsciiParser.Parse(ascii_map, out int outStartX, out int outStartY);
-            StartX = outStartX;
-            StartY = outStartY;
+            _tiles = Build.AsciiParser.Parse(ascii_map, out Start);
             if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
@@ -62,7 +58,7 @@ namespace Labyrinth
             return res.ToString();
         }
 
-        public ICrawler NewCrawler() => new Crawler(_tiles, StartX, StartY);
+        public ICrawler NewCrawler() => new Crawler(_tiles, Start);
 
         private readonly Tile[,] _tiles;
     }
