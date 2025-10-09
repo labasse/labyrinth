@@ -3,20 +3,13 @@ using Labyrinth.Tiles;
 
 namespace Labyrinth.Crawl;
 
-public class Crawler : ICrawler
+public class Crawler(Tile[,] tiles, int x, int y) : ICrawler
 {
-    private readonly Tile[,] _tiles;
-    public Crawler(Tile[,] tiles, int x, int y)
-    {
-        _tiles = tiles ?? throw new ArgumentNullException(nameof(tiles));
-        X = x;
-        Y = y;
-        Direction = Direction.North;
-        
-    }
-    public int X { get; private set; }
-    public int Y { get; private set; }
-    public Direction Direction { get; }
+    private readonly Tile[,] _tiles = tiles ?? throw new ArgumentNullException(nameof(tiles));
+    public int X { get; private set; } = x;
+    public int Y { get; private set; } = y;
+    public Direction Direction { get; } = Direction.North;
+
     public Tile FacingTile
     {
         get

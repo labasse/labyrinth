@@ -1,17 +1,16 @@
-﻿using System.Runtime.CompilerServices;
-using Labyrinth.Tiles;
+﻿using Labyrinth.Tiles;
 
 namespace Labyrinth.Build
 {
-    public class AsciiParser
+    public static class AsciiParser
     {
-        public static Tile[,] Parse(string ascii_map, out int startX, out int startY)
+        public static Tile[,] Parse(string asciiMap, out int startX, out int startY)
         {
-            var lines = ascii_map.Split("\n,\r\n".Split(','), StringSplitOptions.None);
+            var lines = asciiMap.Split("\n,\r\n".Split(','), StringSplitOptions.None);
             var width = lines[0].Length;
             var tiles = new Tile[width, lines.Length];
             
-            using var km = new Keymaster();
+            using var km = new KeyMaster();
             
             int? sx = null, sy = null;
 

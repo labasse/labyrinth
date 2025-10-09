@@ -9,19 +9,19 @@ namespace Labyrinth
         /// <summary>
         /// Labyrinth with walls, doors and collectable items.
         /// </summary>
-        /// <param name="ascii_map">A multiline string with '+', '-' or '|' for walls, '/' for doors and 'k' for key locations</param>
+        /// <param name="asciiMap">A multiline string with '+', '-' or '|' for walls, '/' for doors and 'k' for key locations</param>
         /// <exception cref="ArgumentException">Thrown when string argument reveals inconsistent map sizes or characters.</exception>
         /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
-        public Labyrinth(string ascii_map)
+        public Labyrinth(string asciiMap)
         {
-            _tiles = Build.AsciiParser.Parse(ascii_map, out var x, out var y);
+            _tiles = Build.AsciiParser.Parse(asciiMap, out var x, out var y);
             if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
             }
 
-            this.StartX = x;
-            this.StartY = y;
+            StartX = x;
+            StartY = y;
         }
 
         /// <summary>
@@ -37,12 +37,12 @@ namespace Labyrinth
         /// <summary>
         /// Labyrinth start x.
         /// </summary>
-        public int StartX { get; private init; }
+        private int StartX { get; }
 
         /// <summary>
         /// Labyrinth start y.
         /// </summary>
-        public int StartY { get; private init; }
+        private int StartY { get; }
 
         /// <summary>
         /// An ascii representation of the labyrinth.

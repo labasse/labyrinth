@@ -10,12 +10,12 @@ public class LabyrinthCrawlerTest
     [Test]
     public void InitWithCenteredX()
     {
-        var laby = new Labyrinth.Labyrinth("""
+        var labyrinth = new Labyrinth.Labyrinth("""
                 +--+
                 | x|
                 +--+
                 """);
-        var test = laby.NewCrawler();
+        var test = labyrinth.NewCrawler();
 
         using var all = Assert.EnterMultipleScope();
 
@@ -28,14 +28,14 @@ public class LabyrinthCrawlerTest
     [Test]
     public void InitWithMultipleXUsesLastOne()
     {
-        var laby = new Labyrinth.Labyrinth("""
-                                           +---+
-                                           |  x|
-                                           | x |
-                                           |x  |
-                                           +---+
-                                           """);
-        var test = laby.NewCrawler();
+        var labyrinth = new Labyrinth.Labyrinth("""
+                                                +---+
+                                                |  x|
+                                                | x |
+                                                |x  |
+                                                +---+
+                                                """);
+        var test = labyrinth.NewCrawler();
 
         using var all = Assert.EnterMultipleScope();
 
@@ -48,7 +48,7 @@ public class LabyrinthCrawlerTest
     {
         Assert.Throws<ArgumentException>(() =>
         {
-            var labyrinth = new Labyrinth.Labyrinth("""
+            var unused = new Labyrinth.Labyrinth("""
                                                     +--+
                                                     |  |
                                                     +--+
@@ -258,12 +258,12 @@ public class LabyrinthCrawlerTest
     [Test]
     public void WalkUseKeyToOpenADoorAndPass()
     {
-        var laby = new Labyrinth.Labyrinth("""
-                +--+
-                |xk|
-                +-/|
-                """);
-        var test = laby.NewCrawler();
+        var labyrinth = new Labyrinth.Labyrinth("""
+                                                +--+
+                                                |xk|
+                                                +-/|
+                                                """);
+        var test = labyrinth.NewCrawler();
 
         test.Direction.TurnRight();
 
