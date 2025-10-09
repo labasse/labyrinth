@@ -269,7 +269,9 @@ public class LabyrinthCrawlerTest
         var inventory = crawler.Walk();
 
         crawler.Direction.TurnRight();
-        ((Door)crawler.FacingTile).Open(inventory);
+
+        var door = crawler.FacingTile as Door ?? throw new InvalidOperationException("Expected a door");
+        var opened = door.Open(inventory);
 
         crawler.Walk();
 
