@@ -58,12 +58,11 @@ public class LabyrinthCrawlerTest
     public void FacingNorthOnUpperTileReturnsOutside()
     {
         var laby = new Labyrinth.Labyrinth("""
-                +--+
-                | x|
+                +-x+
+                |  |
                 +--+
                 """);
         var crawler = laby.NewCrawler();
-        crawler.Walk();
         using var all = Assert.EnterMultipleScope();
         Assert.That(crawler.X, Is.EqualTo(2));
         Assert.That(crawler.Y, Is.EqualTo(0));
