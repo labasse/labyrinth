@@ -107,7 +107,19 @@ public class LabyrinthCrawlerTest
     [Test]
     public void FacingSouthOnBottomTileReturnsOutside()
     {
-        Assert.That(false);
+        var laby = new Labyrinth.Labyrinth("""
+                +--+
+                |  |
+                +-x+
+                """);
+        var crawler = laby.NewCrawler();
+        crawler.Direction.TurnRight();
+        crawler.Direction.TurnRight();
+        using var all = Assert.EnterMultipleScope();
+        Assert.That(crawler.X, Is.EqualTo(2));
+        Assert.That(crawler.Y, Is.EqualTo(2));
+        Assert.That(crawler.Direction, Is.EqualTo(Direction.South));
+        Assert.That(crawler.FacingTile, Is.TypeOf<Outside>());
     }
     #endregion
 
