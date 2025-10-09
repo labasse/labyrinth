@@ -16,7 +16,7 @@ namespace Labyrinth.Build
             var lines = ascii_map.Split("\n,\r\n".Split(','), StringSplitOptions.None);
             var width = lines[0].Length;
             var tiles = new Tile[width, lines.Length];
-            start = new Point(-1, -1);
+            start = Point.Invalid;
 
             using var km = new Keymaster();
 

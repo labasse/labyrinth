@@ -37,4 +37,13 @@ public class PointTest
         Assert.That(test.X, Is.EqualTo(3));
         Assert.That(test.Y, Is.EqualTo(5));
     }
+
+    [Test]
+    public void TestInvalid()
+    {
+        var test = Point.Invalid;
+        using var all = Assert.EnterMultipleScope();
+        Assert.That(test.X, Is.EqualTo(-1));
+        Assert.That(test.Y, Is.EqualTo(-1));
+    }
 }

@@ -5,6 +5,12 @@ namespace Labyrinth.Crawl
     /// </summary>
     public record struct Point(int X, int Y)
     {
+
+        /// <summary>
+        /// An invalid point, with coordinates (-1, -1).
+        /// </summary>
+        public static readonly Point Invalid = new(-1, -1);
+
         /// <summary>
         /// Adds a direction to a point, resulting in a new point.
         /// </summary>

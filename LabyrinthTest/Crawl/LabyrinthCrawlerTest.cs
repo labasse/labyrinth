@@ -44,7 +44,12 @@ public class LabyrinthCrawlerTest
     [Test]
     public void InitWithNoXThrowsArgumentException()
     {
-        Assert.That(false);
+        var laby = new Labyrinth.Labyrinth("""
+                +--+
+                |  |
+                +--+
+                """);
+        Assert.Throws<ArgumentException>(() => laby.NewCrawler());
     }
     #endregion
 

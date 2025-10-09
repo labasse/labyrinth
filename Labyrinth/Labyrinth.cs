@@ -58,7 +58,14 @@ namespace Labyrinth
             return res.ToString();
         }
 
-        public ICrawler NewCrawler() => new Crawler(_tiles, Start);
+        public ICrawler NewCrawler()
+        {
+            if (Start == Point.Invalid)
+            {
+                throw new ArgumentException("No starting position defined in labyrinth");
+            }
+            return new Crawler(_tiles, Start);
+        }
 
         private readonly Tile[,] _tiles;
     }
