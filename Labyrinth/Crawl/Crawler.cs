@@ -37,7 +37,10 @@ namespace Labyrinth.Crawl
 
         public Inventory Walk()
         {
-            throw new NotImplementedException();
+            Point destination = Position + Direction;
+            Inventory inventory = FacingTile.Pass();
+            Position = destination;
+            return inventory;
         }
     }
 }

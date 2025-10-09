@@ -1,4 +1,5 @@
 ﻿using Labyrinth.Crawl;
+using Labyrinth.Items;
 using Labyrinth.Tiles;
 
 namespace LabyrinthTest.Crawl;
@@ -144,7 +145,23 @@ public class LabyrinthCrawlerTest
     [Test]
     public void WalkReturnsInventoryAndChangesPositionAndFacingTile()
     {
-        Assert.That(false);
+        var laby = new Labyrinth.Labyrinth("""
+                +--+
+                |  |
+                |x |
+                +--+
+                """);
+        var crawler = laby.NewCrawler();
+        var inventory = crawler.Walk();
+
+        using var all = Assert.EnterMultipleScope();
+
+        Assert.That(inventory, Is.Not.Null);
+        Assert.That(inventory, Is.AssignableTo<Inventory>());
+        Assert.That(crawler.X, Is.EqualTo(1));
+        Assert.That(crawler.Y, Is.EqualTo(1));
+        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
+        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
     }
 
     [Test]
@@ -181,23 +198,23 @@ public class LabyrinthCrawlerTest
                 |xk|
                 +-/|
                 """);
-        var test = laby.NewCrawler();
+        var crawler = laby.NewCrawler();
 
-        test.Direction.TurnRight();
+        crawler.Direction.TurnRight();
 
-        var inventory = test.Walk();
+        var inventory = crawler.Walk();
 
-        test.Direction.TurnRight();
-        ((Door)test.FacingTile).Open(inventory);
+        crawler.Direction.TurnRight();
+        ((Door)crawler.FacingTile).Open(inventory);
 
-        test.Walk();
+        crawler.Walk();
 
         using var all = Assert.EnterMultipleScope();
 
-        Assert.That(test.X, Is.EqualTo(2));
-        Assert.That(test.Y, Is.EqualTo(2));
-        Assert.That(test.Direction, Is.EqualTo(Direction.South));
-        Assert.That(test.FacingTile, Is.TypeOf<Outside>());
+        Assert.That(crawler.X, Is.EqualTo(2));
+        Assert.That(crawler.Y, Is.EqualTo(2));
+        Assert.That(crawler.Direction, Is.EqualTo(Direction.South));
+        Assert.That(crawler.FacingTile, Is.TypeOf<Outside>());
     }
     #endregion
 }
