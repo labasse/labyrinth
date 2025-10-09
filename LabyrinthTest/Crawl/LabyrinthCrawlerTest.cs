@@ -226,7 +226,32 @@ public class LabyrinthCrawlerTest
     [Test]
     public void WalkUseAWrongKeyToOpenADoor()
     {
-        Assert.That(false);
+        var laby = new Labyrinth.Labyrinth("""
+                +---+
+                |xk/|
+                | /k|
+                +---+
+                """);
+        var crawler = laby.NewCrawler();
+
+        crawler.Direction.TurnRight();
+        var wrongKeyInventory = crawler.Walk();
+
+        crawler.Direction.TurnRight();
+        var door = crawler.FacingTile as Door ?? throw new InvalidOperationException("Expected a door");
+
+        var opened = door.Open(wrongKeyInventory);
+
+        using var all = Assert.EnterMultipleScope();
+
+        Assert.That(opened, Is.False);
+        Assert.That(door.IsLocked, Is.True);
+        Assert.That(wrongKeyInventory.HasItem, Is.True);
+        Assert.That(wrongKeyInventory.ItemType, Is.EqualTo(typeof(Key)));
+        Assert.That(crawler.X, Is.EqualTo(2));
+        Assert.That(crawler.Y, Is.EqualTo(1));
+        Assert.That(crawler.Direction, Is.EqualTo(Direction.South));
+        Assert.That(() => crawler.Walk(), Throws.InvalidOperationException);
     }
 
     [Test]
