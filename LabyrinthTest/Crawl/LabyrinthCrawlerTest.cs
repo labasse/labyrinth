@@ -211,6 +211,34 @@ public class LabyrinthCrawlerTest
 
         Assert.That(() => crawler.Walk(), Throws.InvalidOperationException);
     }
+    [Test]
+    public void FailedWalkDoesNotMove()
+    {
+        var laby = new Labyrinth.Labyrinth("""
+        +--+
+        |x |
+        +--+
+        """);
+        var crawler = laby.NewCrawler();
+
+        int x = crawler.X;
+        int y = crawler.Y;
+        Direction dir = crawler.Direction;
+        Assert.That(() => crawler.Walk(), Throws.InvalidOperationException);
+        Assert.That((crawler.X, crawler.Y, crawler.Direction), Is.EqualTo((x, y, dir)));
+    }
+    [Test]
+    public void FacingOutsideIsSingleton()
+    {
+        var laby = new Labyrinth.Labyrinth("""
+        +-x+
+        |  |
+        +--+
+        """);
+        var crawler = laby.NewCrawler();
+
+        Assert.That(crawler.FacingTile, Is.SameAs(Outside.Singleton));
+    }
     #endregion
 
     #region Items and doors
