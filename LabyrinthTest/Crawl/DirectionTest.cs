@@ -75,4 +75,15 @@ public class DirectionTest
         Assert.That(test, Is.EqualTo(Direction.East));
     }
 
+    [Test]
+    public void TestDeconstruct()
+    {
+        var test = Direction.South;
+        var (x, y) = test;
+
+        using var all = Assert.EnterMultipleScope();
+        Assert.That(x, Is.EqualTo(0));
+        Assert.That(y, Is.EqualTo(1));
+    }
+
 }

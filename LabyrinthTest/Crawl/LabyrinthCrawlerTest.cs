@@ -198,6 +198,19 @@ public class LabyrinthCrawlerTest
         var crawler = laby.NewCrawler();
         Assert.That(() => crawler.Walk(), Throws.InvalidOperationException);
     }
+
+    [Test]
+    public void WalkOutOfTheLabyrinthThrowsInvalidOperationException()
+    {
+        var laby = new Labyrinth.Labyrinth("""
+                +-x+
+                |  |
+                +--+
+                """);
+        var crawler = laby.NewCrawler();
+
+        Assert.That(() => crawler.Walk(), Throws.InvalidOperationException);
+    }
     #endregion
 
     #region Items and doors
