@@ -40,6 +40,16 @@ namespace Labyrinth.Items
             from._item = null;
         }
 
+        [MemberNotNull(nameof(_item))]
+        public void AddItem(ICollectable item)
+        {
+            if (HasItem)
+            {
+                throw new InvalidOperationException("Inventory already has an item.");
+            }
+            _item = item;
+        }
+
         protected ICollectable? _item = item;
     }
 }

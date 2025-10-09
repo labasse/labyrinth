@@ -14,6 +14,12 @@ namespace Labyrinth.Build
         /// <exception cref="InvalidOperationException">Some keys are missing or are not placed.</exception>
         public void Dispose()
         {
+            if (emptyKeyRoom is not null && !unplacedKey.HasItem)
+            {
+                emptyKeyRoom.Pass().AddItem(new Key());
+                emptyKeyRoom = null;
+            }
+
             if (unplacedKey.HasItem || emptyKeyRoom is not null)
             {
                 throw new InvalidOperationException("Unmatched key/door creation");

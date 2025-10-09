@@ -7,34 +7,56 @@ namespace Labyrinth
     public class Labyrinth
     {
         /// <summary>
-        /// Labyrinth with walls, doors and collectable items.
+        /// Labyrinth avec murs, portes et objets.
         /// </summary>
-        /// <param name="ascii_map">A multiline string with '+', '-' or '|' for walls, '/' for doors and 'k' for key locations</param>
-        /// <exception cref="ArgumentException">Thrown when string argument reveals inconsistent map sizes or characters.</exception>
-        /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
+        /// <param name="ascii_map">Chaîne multi-lignes avec '+', '-' ou '|' pour les murs, '/' pour les portes, 'k' pour les clés et 'x' pour la position de départ.</param>
+        /// <exception cref="ArgumentException">Incohérences de carte.</exception>
+        /// <exception cref="NotSupportedException">Multiples portes/clés avant placement.</exception>
         public Labyrinth(string ascii_map)
         {
-            _tiles = Build.AsciiParser.Parse(ascii_map);
-            if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
+            var separators = "\n,\r\n".Split(',');
+            var lines = ascii_map.Split(separators, StringSplitOptions.None);
+            int? sx = null, sy = null;
+            for (int y = 0; y < lines.Length; y++)
+            {
+                var line = lines[y];
+                for (int x = 0; x < line.Length; x++)
+                {
+                    if (line[x] == 'x')
+                    {
+                        sx = x;
+                        sy = y; 
+                    }
+                }
+            }
+
+            _startX = sx;
+            _startY = sy;
+
+            var cleaned = sx is null ? ascii_map : ascii_map.Replace('x', ' ');
+
+            _tiles = Build.AsciiParser.Parse(cleaned);
+            Width = _tiles.GetLength(0);
+            Height = _tiles.GetLength(1);
+            if (Width < 3 || Height < 3)
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
             }
         }
 
         /// <summary>
-        /// Labyrinth width (number of columns).
+        /// Largeur (colonnes)
         /// </summary>
         public int Width { get; private init; }
 
         /// <summary>
-        /// Labyrinth height (number of rows).
+        /// Hauteur (lignes)
         /// </summary>
         public int Height { get; private init; }
 
         /// <summary>
-        /// An ascii representation of the labyrinth.
+        /// Représentation ascii du labyrinthe.
         /// </summary>
-        /// <returns>Formatted string</returns>
         public override string ToString()
         {
             var res = new StringBuilder();
@@ -56,8 +78,17 @@ namespace Labyrinth
             return res.ToString();
         }
 
-        public ICrawler NewCrawler() => throw new NotImplementedException("To be implemented");
+        public ICrawler NewCrawler()
+        {
+            if (_startX is null || _startY is null)
+            {
+                throw new ArgumentException("No starting position 'x' defined in map");
+            }
+            return new Crawl.Crawler(_tiles, _startX.Value, _startY.Value);
+        }
 
         private readonly Tile[,] _tiles;
+        private readonly int? _startX;
+        private readonly int? _startY;
     }
 }
