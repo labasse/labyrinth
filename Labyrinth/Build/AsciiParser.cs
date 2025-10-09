@@ -4,7 +4,7 @@ namespace Labyrinth.Build
 {
     public class AsciiParser
     {
-        public static Tile[,] Parse(string ascii_map)
+        public static Tile[,] Parse(string ascii_map, Labyrinth lab)
         {
             var lines = ascii_map.Split("\n,\r\n".Split(','), StringSplitOptions.None);
             var width = lines[0].Length;
@@ -26,6 +26,7 @@ namespace Labyrinth.Build
                         '+' or '-' or '|' => Wall.Singleton,
                         '/' => km.NewDoor(),
                         'k' => km.NewKeyRoom(),
+                        'x' => lab.CreateStartingRoom(),
                         _ => throw new ArgumentException($"Invalid map: unknown character '{lines[y][x]}' at line {y}, col {x}.")
                     };
                 }

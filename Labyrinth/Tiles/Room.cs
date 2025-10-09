@@ -9,8 +9,14 @@ namespace Labyrinth.Tiles
     /// Initialize a new room, optionally with a collectable item.
     /// </remarks>
     /// <param name="item">Item in the room</param>
-    public class Room(ICollectable? item = null) : Tile(item)
+    /// <param name="isStart">Room is the starting point of the crawler</param>
+    public class Room(ICollectable? item = null, bool isStart = false) : Tile(item)
     {
         public override bool IsTraversable => true;
+        
+        /// <summary>
+        /// Gets a value indicating whether the tile is the starting point of the labyrinth.
+        /// </summary>
+        public bool IsStartingPoint { get; set; } = isStart;
     }
 }
