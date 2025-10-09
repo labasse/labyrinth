@@ -203,7 +203,24 @@ public class LabyrinthCrawlerTest
     [Test]
     public void WalkInARoomWithAnItem()
     {
-        Assert.That(false);
+        var laby = new Labyrinth.Labyrinth("""
+                +--+
+                |k |
+                |x |
+                +-/|
+                """);
+        var crawler = laby.NewCrawler();
+        var inventory = crawler.Walk();
+
+        using var all = Assert.EnterMultipleScope();
+
+        Assert.That(inventory, Is.Not.Null);
+        Assert.That(inventory, Is.AssignableTo<Inventory>());
+        Assert.That(inventory.HasItem, Is.True);
+        Assert.That(crawler.X, Is.EqualTo(1));
+        Assert.That(crawler.Y, Is.EqualTo(1));
+        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
+        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
     }
 
     [Test]
