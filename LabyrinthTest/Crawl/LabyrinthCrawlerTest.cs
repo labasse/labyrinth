@@ -7,6 +7,27 @@ namespace LabyrinthTest.Crawl;
 [TestFixture(Description = "Integration test for the crawler implementation in the labyrinth")]
 public class LabyrinthCrawlerTest
 {
+    static void AssertState(ICrawler crawler, int x, int y, Direction direction, Type facingTileType)
+    {
+        Assert.That(crawler.X, Is.EqualTo(x));
+        Assert.That(crawler.Y, Is.EqualTo(y));
+        Assert.That(crawler.Direction, Is.EqualTo(direction));
+        Assert.That(crawler.FacingTile, Is.TypeOf(facingTileType));
+    }
+
+    static void AssertInventory(Inventory inventory, bool hasItem = false, Type? itemType = null)
+    {
+        Assert.That(inventory, Is.Not.Null);
+        if (!hasItem)
+        {
+            Assert.That(inventory.HasItem, Is.False);
+            Assert.That(() => inventory.ItemType, Throws.TypeOf<InvalidOperationException>());
+        }
+        else Assert.That(inventory.HasItem, Is.True);
+        Assert.That(inventory, Is.AssignableTo<Inventory>());
+        if (itemType != null) Assert.That(inventory.ItemType, Is.EqualTo(itemType));
+    }
+
     #region Initialization
     [Test]
     public void InitWithCenteredX()
@@ -19,11 +40,7 @@ public class LabyrinthCrawlerTest
         var crawler = laby.NewCrawler();
 
         using var all = Assert.EnterMultipleScope();
-
-        Assert.That(crawler.X, Is.EqualTo(2));
-        Assert.That(crawler.Y, Is.EqualTo(1));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
+        AssertState(crawler, 2, 1, Direction.North, typeof(Wall));
     }
 
     [Test]
@@ -35,11 +52,9 @@ public class LabyrinthCrawlerTest
                 +---+
                 """);
         var crawler = laby.NewCrawler();
+
         using var all = Assert.EnterMultipleScope();
-        Assert.That(crawler.X, Is.EqualTo(3));
-        Assert.That(crawler.Y, Is.EqualTo(1));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
+        AssertState(crawler, 3, 1, Direction.North, typeof(Wall));
     }
 
     [Test]
@@ -50,7 +65,8 @@ public class LabyrinthCrawlerTest
                 |  |
                 +--+
                 """);
-        Assert.Throws<ArgumentException>(() => laby.NewCrawler());
+
+        Assert.That(() => laby.NewCrawler(), Throws.TypeOf<ArgumentException>());
     }
     #endregion
 
@@ -64,11 +80,9 @@ public class LabyrinthCrawlerTest
                 +--+
                 """);
         var crawler = laby.NewCrawler();
+
         using var all = Assert.EnterMultipleScope();
-        Assert.That(crawler.X, Is.EqualTo(2));
-        Assert.That(crawler.Y, Is.EqualTo(0));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Outside>());
+        AssertState(crawler, 2, 0, Direction.North, typeof(Outside));
     }
 
     [Test]
@@ -80,12 +94,11 @@ public class LabyrinthCrawlerTest
                 +--+
                 """);
         var crawler = laby.NewCrawler();
+
         crawler.Direction.TurnLeft();
+
         using var all = Assert.EnterMultipleScope();
-        Assert.That(crawler.X, Is.EqualTo(0));
-        Assert.That(crawler.Y, Is.EqualTo(1));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.West));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Outside>());
+        AssertState(crawler, 0, 1, Direction.West, typeof(Outside));
     }
 
     [Test]
@@ -97,12 +110,11 @@ public class LabyrinthCrawlerTest
                 +--+
                 """);
         var crawler = laby.NewCrawler();
+
         crawler.Direction.TurnRight();
+
         using var all = Assert.EnterMultipleScope();
-        Assert.That(crawler.X, Is.EqualTo(3));
-        Assert.That(crawler.Y, Is.EqualTo(1));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.East));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Outside>());
+        AssertState(crawler, 3, 1, Direction.East, typeof(Outside));
     }
 
     [Test]
@@ -116,11 +128,9 @@ public class LabyrinthCrawlerTest
         var crawler = laby.NewCrawler();
         crawler.Direction.TurnRight();
         crawler.Direction.TurnRight();
+
         using var all = Assert.EnterMultipleScope();
-        Assert.That(crawler.X, Is.EqualTo(2));
-        Assert.That(crawler.Y, Is.EqualTo(2));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.South));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Outside>());
+        AssertState(crawler, 2, 2, Direction.South, typeof(Outside));
     }
     #endregion
 
@@ -134,12 +144,11 @@ public class LabyrinthCrawlerTest
                 +--+
                 """);
         var crawler = laby.NewCrawler();
+
         crawler.Direction.TurnLeft();
+
         using var all = Assert.EnterMultipleScope();
-        Assert.That(crawler.X, Is.EqualTo(1));
-        Assert.That(crawler.Y, Is.EqualTo(1));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.West));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
+        AssertState(crawler, 1, 1, Direction.West, typeof(Wall));
     }
 
     [Test]
@@ -156,12 +165,8 @@ public class LabyrinthCrawlerTest
 
         using var all = Assert.EnterMultipleScope();
 
-        Assert.That(inventory, Is.Not.Null);
-        Assert.That(inventory, Is.AssignableTo<Inventory>());
-        Assert.That(crawler.X, Is.EqualTo(1));
-        Assert.That(crawler.Y, Is.EqualTo(1));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
+        AssertInventory(inventory, false);
+        AssertState(crawler, 1, 1, Direction.North, typeof(Wall));
     }
 
     [Test]
@@ -178,12 +183,8 @@ public class LabyrinthCrawlerTest
 
         using var all = Assert.EnterMultipleScope();
 
-        Assert.That(inventory, Is.Not.Null);
-        Assert.That(inventory, Is.AssignableTo<Inventory>());
-        Assert.That(crawler.X, Is.EqualTo(2));
-        Assert.That(crawler.Y, Is.EqualTo(1));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.East));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
+        AssertInventory(inventory, false);
+        AssertState(crawler, 2, 1, Direction.East, typeof(Wall));
     }
 
     [Test]
@@ -195,7 +196,7 @@ public class LabyrinthCrawlerTest
                 +--+
                 """);
         var crawler = laby.NewCrawler();
-        Assert.Throws<InvalidOperationException>(() => crawler.Walk());
+        Assert.That(() => crawler.Walk(), Throws.InvalidOperationException);
     }
     #endregion
 
@@ -214,13 +215,8 @@ public class LabyrinthCrawlerTest
 
         using var all = Assert.EnterMultipleScope();
 
-        Assert.That(inventory, Is.Not.Null);
-        Assert.That(inventory, Is.AssignableTo<Inventory>());
-        Assert.That(inventory.HasItem, Is.True);
-        Assert.That(crawler.X, Is.EqualTo(1));
-        Assert.That(crawler.Y, Is.EqualTo(1));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.North));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Wall>());
+        AssertInventory(inventory, true);
+        AssertState(crawler, 1, 1, Direction.North, typeof(Wall));
     }
 
     [Test]
@@ -236,21 +232,16 @@ public class LabyrinthCrawlerTest
 
         crawler.Direction.TurnRight();
         var wrongKeyInventory = crawler.Walk();
-
         crawler.Direction.TurnRight();
         var door = crawler.FacingTile as Door ?? throw new InvalidOperationException("Expected a door");
-
         var opened = door.Open(wrongKeyInventory);
 
         using var all = Assert.EnterMultipleScope();
 
         Assert.That(opened, Is.False);
         Assert.That(door.IsLocked, Is.True);
-        Assert.That(wrongKeyInventory.HasItem, Is.True);
-        Assert.That(wrongKeyInventory.ItemType, Is.EqualTo(typeof(Key)));
-        Assert.That(crawler.X, Is.EqualTo(2));
-        Assert.That(crawler.Y, Is.EqualTo(1));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.South));
+        AssertInventory(wrongKeyInventory, true, typeof(Key));
+        AssertState(crawler, 2, 1, Direction.South, typeof(Door));
         Assert.That(() => crawler.Walk(), Throws.InvalidOperationException);
     }
 
@@ -265,22 +256,17 @@ public class LabyrinthCrawlerTest
         var crawler = laby.NewCrawler();
 
         crawler.Direction.TurnRight();
-
         var inventory = crawler.Walk();
-
         crawler.Direction.TurnRight();
-
         var door = crawler.FacingTile as Door ?? throw new InvalidOperationException("Expected a door");
         var opened = door.Open(inventory);
-
         crawler.Walk();
 
         using var all = Assert.EnterMultipleScope();
-
-        Assert.That(crawler.X, Is.EqualTo(2));
-        Assert.That(crawler.Y, Is.EqualTo(2));
-        Assert.That(crawler.Direction, Is.EqualTo(Direction.South));
-        Assert.That(crawler.FacingTile, Is.TypeOf<Outside>());
+        Assert.That(opened, Is.True);
+        Assert.That(door.IsLocked, Is.False);
+        AssertInventory(inventory, false);
+        AssertState(crawler, 2, 2, Direction.South, typeof(Outside));
     }
     #endregion
 }
