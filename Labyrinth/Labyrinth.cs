@@ -74,7 +74,11 @@ namespace Labyrinth
             }
             return res.ToString();
         }
-
+        
+        /// <summary>
+        /// Creates a new crawler starting at the labyrinth's starting room.
+        /// </summary>
+        /// <returns>A new crawler instance</returns>
         public ICrawler NewCrawler()
         {
             for (int y = 0; y < _tiles.GetLength(1); y++)
@@ -90,6 +94,13 @@ namespace Labyrinth
             throw new ArgumentException("No starting room defined in the labyrinth");
         }
         
+        /// <summary>
+        /// Gets the tile in front of the given coordinates and direction.
+        /// </summary>
+        /// param name="x">Current X coordinate</param>
+        /// param name="y">Current Y coordinate</param>
+        /// param name="direction">Current direction</param>
+        /// <returns>The tile in front of the given coordinates and direction, or an Outside tile
         private Tile GetFacingTile(int x, int y, Direction direction)
         {
             int fx = x + direction.DeltaX;

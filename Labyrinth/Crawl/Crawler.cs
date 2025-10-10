@@ -19,7 +19,11 @@ public class Crawler : ICrawler
         Direction = direction;
         _getFacingTile = getFacingTile;
     }
-
+    
+    /// <summary>
+    /// Pass the tile in front of the crawler and move into it.
+    /// </summary>
+    /// <returns>An inventory of the collectable items in the place reached.</returns>
     public Inventory Walk()
     {
         if (!FacingTile.IsTraversable)
