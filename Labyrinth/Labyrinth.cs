@@ -1,123 +1,63 @@
+﻿using Labyrinth.Crawl;
+using Labyrinth.Tiles;
+using System.Text;
+
 namespace Labyrinth
 {
     public class Labyrinth
     {
-        private const char WallCorner = '+';
-        private const char WallHorizontal = '-';
-        private const char WallVertical = '|';
-        private const char DoorSymbol = '/';
-        private const char KeyRoomSymbol = 'k';
-        private const char EmptySpace = ' ';
-        
-        public int Width { get; }
-        public int Height { get; }
-        private readonly Tile[,] Tiles;
-
-        public Labyrinth(string map)
+        /// <summary>
+        /// Labyrinth with walls, doors and collectable items.
+        /// </summary>
+        /// <param name="ascii_map">A multiline string with '+', '-' or '|' for walls, '/' for doors and 'k' for key locations</param>
+        /// <exception cref="ArgumentException">Thrown when string argument reveals inconsistent map sizes or characters.</exception>
+        /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
+        public Labyrinth(string ascii_map)
         {
-            ValidateMap(map);
-            
-            var lines = map.Replace("\r", string.Empty).Split('\n');
-            Height = lines.Length;
-            Width = lines[0].Length;
-            Tiles = new Tile[Height, Width];
-            
-            InitializeTiles(lines);
-        }
-
-        private void ValidateMap(string map)
-        {
-            if (string.IsNullOrEmpty(map))
-                throw new ArgumentException("La carte ne peut pas être vide.", nameof(map));
-                
-            var lines = map.Replace("\r", string.Empty).Split('\n');
-            if (lines.Length == 0)
-                throw new ArgumentException("La carte doit contenir au moins une ligne.", nameof(map));
-                
-            var width = lines[0].Length;
-            if (width == 0)
-                throw new ArgumentException("La carte doit avoir une largeur positive.", nameof(map));
-                
-            if (lines.Any(line => line.Length != width))
-                throw new ArgumentException("Toutes les lignes doivent avoir la même longueur.", nameof(map));
-        }
-
-        private void InitializeTiles(string[] lines)
-        {
-            var doors = new List<(int x, int y, Door door)>();
-            var keyRooms = new List<(int x, int y, Room room)>();
-            
-            // Création des tuiles
-            for (var y = 0; y < Height; y++)
+            _tiles = Build.AsciiParser.Parse(ascii_map);
+            if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
             {
-                var line = lines[y];
-                for (var x = 0; x < Width; x++)
-                {
-                    var ch = line[x];
-                    Tiles[y, x] = CreateTile(ch);
-
-                    if (Tiles[y, x] is Door door)
-                    {
-                        doors.Add((x, y, door));
-                    }
-                    else if (ch == KeyRoomSymbol && Tiles[y, x] is Room room)
-                    {
-                        keyRooms.Add((x, y, room));
-                    }
-                }
-            }
-
-            AssociateKeysWithDoors(doors, keyRooms);
-        }
-
-        private static Tile CreateTile(char symbol) => symbol switch
-        {
-            WallCorner or WallHorizontal or WallVertical => new Wall(),
-            DoorSymbol => new Door(),
-            KeyRoomSymbol => new Room(),
-            _ => new Room()
-        };
-
-        private static void AssociateKeysWithDoors(
-            List<(int x, int y, Door door)> doors,
-            List<(int x, int y, Room room)> keyRooms)
-        {
-            foreach (var (doorX, doorY, door) in doors)
-            {
-                var closestKeyRoom = FindClosestAvailableKeyRoom(doorX, doorY, keyRooms);
-                if (closestKeyRoom.room != null)
-                {
-                    closestKeyRoom.room.Item = door.Key;
-                }
+                throw new ArgumentException("Labyrinth must be at least 3x3");
             }
         }
 
-        private static (int x, int y, Room room) FindClosestAvailableKeyRoom(
-            int doorX,
-            int doorY,
-            List<(int x, int y, Room room)> keyRooms)
+        /// <summary>
+        /// Labyrinth width (number of columns).
+        /// </summary>
+        public int Width { get; private init; }
+
+        /// <summary>
+        /// Labyrinth height (number of rows).
+        /// </summary>
+        public int Height { get; private init; }
+
+        /// <summary>
+        /// An ascii representation of the labyrinth.
+        /// </summary>
+        /// <returns>Formatted string</returns>
+        public override string ToString()
         {
-            return keyRooms
-                .Where(kr => kr.room.Item == null)
-                .OrderBy(kr => CalculateManhattanDistance(doorX, doorY, kr.x, kr.y))
-                .FirstOrDefault();
+            var res = new StringBuilder();
+
+            for (int y = 0; y < _tiles.GetLength(1); y++)
+            {
+                for (int x = 0; x < _tiles.GetLength(0); x++)
+                {
+                    res.Append(_tiles[x, y] switch
+                    {
+                        Room => ' ',
+                        Wall => '#',
+                        Door => '/',
+                        _ => throw new NotSupportedException("Unknown tile type")
+                    });
+                }
+                res.AppendLine();
+            }
+            return res.ToString();
         }
 
-        private static int CalculateManhattanDistance(int x1, int y1, int x2, int y2)
-            => Math.Abs(x2 - x1) + Math.Abs(y2 - y1);
+        public ICrawler NewCrawler() => throw new NotImplementedException("To be implemented");
 
-        public Tile GetTile(int x, int y)
-        {
-            ValidateCoordinates(x, y);
-            return Tiles[y, x];
-        }
-
-        private void ValidateCoordinates(int x, int y)
-        {
-            if (x < 0 || x >= Width)
-                throw new ArgumentOutOfRangeException(nameof(x), "La coordonnée X est hors des limites.");
-            if (y < 0 || y >= Height)
-                throw new ArgumentOutOfRangeException(nameof(y), "La coordonnée Y est hors des limites.");
-        }
+        private readonly Tile[,] _tiles;
     }
 }
