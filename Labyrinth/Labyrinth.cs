@@ -6,6 +6,17 @@ namespace Labyrinth
 {
     public class Labyrinth
     {
+        
+        /// <summary>
+        /// Gets the starting X coordinate of the crawler in the labyrinth.
+        /// </summary>
+        public int StartX { get; }
+        
+        /// <summary>
+        /// Gets the starting Y coordinate of the crawler in the labyrinth.
+        /// </summary>
+        public int StartY { get; }
+        
         /// <summary>
         /// Labyrinth with walls, doors and collectable items.
         /// </summary>
@@ -14,11 +25,13 @@ namespace Labyrinth
         /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
         public Labyrinth(string ascii_map)
         {
-            _tiles = Build.AsciiParser.Parse(ascii_map);
+            _tiles = Build.AsciiParser.Parse(ascii_map, out var start_x, out var start_y);
             if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
             }
+            StartX = start_x;
+            StartY = start_y;
         }
 
         /// <summary>
@@ -56,8 +69,23 @@ namespace Labyrinth
             return res.ToString();
         }
 
-        public ICrawler NewCrawler() => throw new NotImplementedException("To be implemented");
+        /// <summary>
+        /// Creates a new crawler positioned at the starting coordinates.
+        /// Throws <see cref="ArgumentException"/> if no starting point ('x') is defined.
+        /// </summary>
+        /// <returns>An instance of <see cref="ICrawler"/> positioned at the start.</returns>
+        /// <exception cref="ArgumentException">Thrown if the labyrinth has no starting point.</exception>
+        public ICrawler NewCrawler()
+        {
+            if (StartX < 0 || StartY < 0)
+                throw new ArgumentException("No starting point ('x') defined in the labyrinth.");
+            
+            return new Crawler(_tiles, StartX, StartY);
+        }
 
+        /// <summary>
+        /// Internal 2D array representing the labyrinth tiles.
+        /// </summary>
         private readonly Tile[,] _tiles;
     }
 }
