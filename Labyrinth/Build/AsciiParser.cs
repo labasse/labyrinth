@@ -4,11 +4,14 @@ namespace Labyrinth.Build
 {
     public class AsciiParser
     {
-        public static Tile[,] Parse(string ascii_map)
+        public static Tile[,] Parse(string ascii_map, out int start_x, out int start_y)
         {
             var lines = ascii_map.Split("\n,\r\n".Split(','), StringSplitOptions.None);
             var width = lines[0].Length;
             var tiles = new Tile[width, lines.Length];
+            
+            start_x = -1;
+            start_y = -1;
             
             using var km = new Keymaster();
 
@@ -22,12 +25,19 @@ namespace Labyrinth.Build
                 {
                     tiles[x, y] = lines[y][x] switch
                     {
-                        ' ' => new Room(),
+                        ' ' or 'x' => new Room(),
                         '+' or '-' or '|' => Wall.Singleton,
                         '/' => km.NewDoor(),
                         'k' => km.NewKeyRoom(),
                         _ => throw new ArgumentException($"Invalid map: unknown character '{lines[y][x]}' at line {y}, col {x}.")
                     };
+
+                    // si on a trouvé le point de départ, on le note après
+                    if (lines[y][x] == 'x')
+                    {
+                        start_x = x;
+                        start_y = y;
+                    }
                 }
             }
             return tiles;
