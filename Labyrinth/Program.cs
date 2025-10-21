@@ -1,11 +1,4 @@
-﻿Console.WriteLine(new Labyrinth.Labyrinth("""
-    +--+--------+
-    |  /        |
-    |  +--+--+  |
-    |     |k    |
-    +--+  |  +--+
-       |k       |
-    +  +-------/|
-    |           |
-    +-----------+
-    """));
+﻿internal class Program
+{
+	private static void Main() { }
+}

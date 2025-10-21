@@ -42,7 +42,7 @@ namespace Labyrinth.Build
         /// Create a new room with key and place the key if a door was previously created.
         /// </summary>
         /// <returns>Created key room</returns>
-        /// <exception cref="NotSupportedException">Multiple keyss before key placement</exception>
+        /// <exception cref="NotSupportedException">Multiple keys before key placement</exception>
         public Room NewKeyRoom()
         {
             if (emptyKeyRoom is not null)

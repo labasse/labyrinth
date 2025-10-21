@@ -4,13 +4,19 @@ namespace Labyrinth.Build
 {
     public class AsciiParser
     {
-        public static Tile[,] Parse(string ascii_map)
+        public static Tile[,] Parse(string ascii_map, out (int X, int Y)? start)
         {
-            var lines = ascii_map.Split("\n,\r\n".Split(','), StringSplitOptions.None);
+            var normalized = ascii_map.ReplaceLineEndings("\n");
+            var lines = normalized.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            if (lines.Length == 0)
+            {
+                throw new ArgumentException("Invalid map: empty content.");
+            }
             var width = lines[0].Length;
             var tiles = new Tile[width, lines.Length];
-            
+
             using var km = new Keymaster();
+            start = null;
 
             for (int y = 0; y < tiles.GetLength(1); y++)
             {
@@ -20,14 +26,20 @@ namespace Labyrinth.Build
                 }
                 for (int x = 0; x < tiles.GetLength(0); x++)
                 {
-                    tiles[x, y] = lines[y][x] switch
+                    var current = lines[y][x];
+                    tiles[x, y] = current switch
                     {
                         ' ' => new Room(),
                         '+' or '-' or '|' => Wall.Singleton,
                         '/' => km.NewDoor(),
                         'k' => km.NewKeyRoom(),
-                        _ => throw new ArgumentException($"Invalid map: unknown character '{lines[y][x]}' at line {y}, col {x}.")
+                        'x' => new Room(),
+                        _ => throw new ArgumentException($"Invalid map: unknown character '{current}' at line {y}, col {x}.")
                     };
+                    if (current == 'x')
+                    {
+                        start = (x, y);
+                    }
                 }
             }
             return tiles;
