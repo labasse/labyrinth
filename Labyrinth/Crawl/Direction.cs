@@ -34,20 +34,12 @@
         /// <summary>
         /// Turns the direction 90 degrees to the right (clockwise).
         /// </summary>
-        public Direction TurnRight()
-        {
-            (DeltaX, DeltaY) = (-DeltaY, DeltaX);
-            return this;
-        }
+        public void TurnRight() => (DeltaX, DeltaY) = (-DeltaY, DeltaX);
 
         /// <summary>
         /// Turns the direction 90 degrees to the left (counter-clockwise).
         /// </summary>
-        public Direction TurnLeft()
-        {
-            (DeltaX, DeltaY) = (DeltaY, -DeltaX);
-            return this;
-        }
+        public void TurnLeft() => (DeltaX, DeltaY) = (DeltaY, -DeltaX);
 
         #region Convenience overrides
         public void Deconstruct(out int deltaX, out int deltaY)
