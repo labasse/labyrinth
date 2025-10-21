@@ -14,11 +14,18 @@ namespace Labyrinth
         /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
         public Labyrinth(string ascii_map)
         {
-            _tiles = Build.AsciiParser.Parse(ascii_map);
+            var parseResult = Build.AsciiParser.Parse(ascii_map);
+            _tiles = parseResult.tiles;
+            _startX = parseResult.startX;
+            _startY = parseResult.startY;
+
             if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
             }
+
+            Width = _tiles.GetLength(0);
+            Height = _tiles.GetLength(1);
         }
 
         /// <summary>
@@ -56,8 +63,10 @@ namespace Labyrinth
             return res.ToString();
         }
 
-        public ICrawler NewCrawler() => throw new NotImplementedException("To be implemented");
+        public ICrawler NewCrawler() => new Crawl.Crawler(_tiles, _startX, _startY);
 
         private readonly Tile[,] _tiles;
+        private readonly int _startX;
+        private readonly int _startY;
     }
 }
