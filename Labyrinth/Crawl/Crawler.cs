@@ -12,6 +12,12 @@ namespace Labyrinth.Crawl
         private readonly int _width;
         private readonly int _height;
 
+        /// <summary>
+        /// Creates a new crawler positioned at the given coordinates and facing North by default.
+        /// </summary>
+        /// <param name="tiles">The 2D grid of tiles representing the labyrinth.</param>
+        /// <param name="startX">The starting X position (column index) in the tiles grid.</param>
+        /// <param name="startY">The starting Y position (row index) in the tiles grid.</param>
         public Crawler(Tile[,] tiles, int startX, int startY)
         {
             _tiles = tiles;
@@ -22,12 +28,27 @@ namespace Labyrinth.Crawl
             Direction = Direction.North;
         }
 
+        /// <summary>
+        /// Current X position of the crawler in the grid.
+        /// </summary>
         public int X { get; private set; }
 
+        /// <summary>
+        /// Current Y position of the crawler in the grid.
+        /// </summary>
         public int Y { get; private set; }
 
+        /// <summary>
+        /// Current facing direction of the crawler.
+        /// </summary>
         public Direction Direction { get; private set; }
 
+        /// <summary>
+        /// The tile located directly in front of the crawler given its current position and direction.
+        /// </summary>
+        /// <remarks>
+        /// Returns <see cref="Outside.Singleton"/> if the next position is out of bounds.
+        /// </remarks>
         public Tile FacingTile
         {
             get
@@ -45,6 +66,11 @@ namespace Labyrinth.Crawl
             }
         }
 
+        /// <summary>
+        /// Moves the crawler forward by one tile in the current direction.
+        /// </summary>
+        /// <returns>An <see cref="Inventory"/> possibly containing items collected while passing through the tile.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the tile in front is not traversable.</exception>
         public Inventory Walk()
         {
             if (!FacingTile.IsTraversable)
