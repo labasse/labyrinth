@@ -1,6 +1,7 @@
 ﻿using Labyrinth.Crawl;
 using Labyrinth.Tiles;
 using System.Text;
+using Labyrinth.Items;
 
 namespace Labyrinth
 {
@@ -14,7 +15,7 @@ namespace Labyrinth
         /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
         public Labyrinth(string ascii_map)
         {
-            _tiles = Build.AsciiParser.Parse(ascii_map);
+            (_tiles, _spawnPoint) = Build.AsciiParser.Parse(ascii_map);
             if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
@@ -56,8 +57,81 @@ namespace Labyrinth
             return res.ToString();
         }
 
-        public ICrawler NewCrawler() => throw new NotImplementedException("To be implemented");
+        public ICrawler NewCrawler() => new Crawler(_spawnPoint.x, _spawnPoint.y, _tiles);
 
         private readonly Tile[,] _tiles;
+        
+        private readonly (int x, int y) _spawnPoint;
+        
+        
+        private class Crawler(int x, int y, Tile[,] tiles)
+            : ICrawler
+        {
+            public int X { get; private set; } = x;
+    
+            public int Y { get; private set; } = y;
+    
+            public Direction Direction { get; } = Direction.North;
+
+            private Tile[,] Tiles { get; } = tiles;
+
+            private Inventory PlayerInventory { get; } = new MyInventory();
+
+            public Tile FacingTile
+            {
+                get {
+                    var newX = X + Direction.DeltaX;
+                    var newY = Y + Direction.DeltaY;
+                    if (newX < 0 || newX >= Tiles.GetLength(0) || newY < 0 || newY >= Tiles.GetLength(1)) {
+                        return Outside.Singleton;
+                    }
+                    return Tiles[newX,  newY]; 
+                }
+            } 
+    
+            public Inventory Walk()
+            {
+                var next = FacingTile;
+                
+                if (next == Outside.Singleton) {
+                    throw new InvalidOperationException("Cannot walk outside the labyrinth bounds."); // In future implementation, we might want to implement "wining" here
+                }
+                if (!next.IsTraversable) {
+                    throw new InvalidOperationException("Cannot walk into a non-traversable tile.");
+                }
+                
+                if (next is Door { IsLocked: true } door) {
+                    try {
+                        door.Open(PlayerInventory);
+                    }
+                    catch (InvalidOperationException) {
+                        throw new InvalidOperationException("Cannot open this door with current inventory.");
+                    }
+                }
+                
+                MoveForward();
+                TryPickupItem();
+                
+                return PlayerInventory;
+            }
+            
+            private void MoveForward()
+            {
+                X += Direction.DeltaX;
+                Y += Direction.DeltaY;
+            }
+
+            private void TryPickupItem()
+            {
+                if (Tiles[X, Y] is not Room room) return;
+                var roomInv = room.Pass();
+                if (roomInv.HasItem) {
+                    PlayerInventory.MoveItemFrom(roomInv);
+                }
+
+            }
+        }
     }
 }
+
+
