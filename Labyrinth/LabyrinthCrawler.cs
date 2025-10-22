@@ -16,8 +16,8 @@ namespace Labyrinth
 
             Direction ICrawler.Direction => _direction;
 
-            public Inventory Walk() => 
-                ProcessFacingTile((facingX, facingY, tile) => 
+            public Inventory Walk() =>
+                ProcessFacingTile((facingX, facingY, tile) =>
                 {
                     var inventory = tile.Pass();
 

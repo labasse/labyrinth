@@ -1,4 +1,3 @@
-using System;
 using Labyrinth.Crawl;
 using Labyrinth.Tiles;
 
@@ -8,6 +7,12 @@ namespace Labyrinth
     {
         private readonly ICrawler crawler;
         private readonly Random random;
+
+        public event EventHandler<CrawlingEventArgs>? PositionChanged;
+        public event EventHandler<CrawlingEventArgs>? DirectionChanged;
+
+        private Direction currentDirection = Direction.North;
+
 
         public RandomExplorer(ICrawler crawler, Random? random = null)
         {
@@ -33,6 +38,7 @@ namespace Labyrinth
                             if (crawler.FacingTile.IsTraversable)
                             {
                                 ++i;
+                                OnPositionChanged();
                                 crawler.Walk();
 
                                 if (crawler.FacingTile is Outside)
@@ -46,12 +52,27 @@ namespace Labyrinth
                         }
                     case 1:
                         crawler.Direction.TurnLeft();
+                        UpdateDirection(Direction.West);
                         break;
                     case 2:
                         crawler.Direction.TurnRight();
+                        UpdateDirection(Direction.East);
                         break;
                 }
             }
+        }
+
+
+        private void UpdateDirection(Direction d)
+        {
+            currentDirection = d;
+
+            DirectionChanged?.Invoke(this, new CrawlingEventArgs(crawler.X, crawler.Y, currentDirection));
+        }
+
+        private void OnPositionChanged()
+        {
+            PositionChanged?.Invoke(this, new CrawlingEventArgs(crawler.X, crawler.Y, currentDirection));
         }
     }
 }
