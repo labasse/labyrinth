@@ -2,14 +2,10 @@
 
 namespace Labyrinth.Tiles
 {
-    /// <summary>
-    /// Base class for all tiles in the labyrinth.
-    /// </summary>
+
     public abstract class Tile(ICollectable? item = null)
     {
-        /// <summary>
-        /// Gets a value indicating whether the tile can be traversed.
-        /// </summary>
+
         public abstract bool IsTraversable { get; }
 
         /// <summary>

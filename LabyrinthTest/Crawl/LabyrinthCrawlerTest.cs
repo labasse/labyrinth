@@ -28,7 +28,7 @@ public class LabyrinthCrawlerTest
     [Test]
     public void InitWithMultipleXUsesLastOne()
     {
-        var laby = new Labyrinth.Labyrinth("""
+         var laby = new Labyrinth.Labyrinth("""
                 +--+
                 |x |
                 | x|

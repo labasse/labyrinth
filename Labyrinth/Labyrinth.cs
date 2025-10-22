@@ -14,28 +14,10 @@ namespace Labyrinth
         /// <exception cref="NotSupportedException">Multiples portes/clés avant placement.</exception>
         public Labyrinth(string ascii_map)
         {
-            var separators = "\n,\r\n".Split(',');
-            var lines = ascii_map.Split(separators, StringSplitOptions.None);
-            int? sx = null, sy = null;
-            for (int y = 0; y < lines.Length; y++)
-            {
-                var line = lines[y];
-                for (int x = 0; x < line.Length; x++)
-                {
-                    if (line[x] == 'x')
-                    {
-                        sx = x;
-                        sy = y; 
-                    }
-                }
-            }
-
+            // Delegate parsing (including recherche du 'x') au parseur ASCII
+            _tiles = Build.AsciiParser.Parse(ascii_map, out int? sx, out int? sy);
             _startX = sx;
             _startY = sy;
-
-            var cleaned = sx is null ? ascii_map : ascii_map.Replace('x', ' ');
-
-            _tiles = Build.AsciiParser.Parse(cleaned);
             Width = _tiles.GetLength(0);
             Height = _tiles.GetLength(1);
             if (Width < 3 || Height < 3)
@@ -44,19 +26,13 @@ namespace Labyrinth
             }
         }
 
-        /// <summary>
-        /// Largeur (colonnes)
-        /// </summary>
+
         public int Width { get; private init; }
 
-        /// <summary>
-        /// Hauteur (lignes)
-        /// </summary>
+
         public int Height { get; private init; }
 
-        /// <summary>
-        /// Représentation ascii du labyrinthe.
-        /// </summary>
+
         public override string ToString()
         {
             var res = new StringBuilder();
