@@ -14,7 +14,13 @@ namespace Labyrinth
         /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
         public Labyrinth(string ascii_map)
         {
-            _tiles = Build.AsciiParser.Parse(ascii_map, ref _start);
+            Build.AsciiParser.StartPositionFound += (_, e) =>
+            {
+                this._start = (e.X, e.Y);
+
+            };
+
+            _tiles = Build.AsciiParser.Parse(ascii_map);
             if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
