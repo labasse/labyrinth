@@ -29,11 +29,11 @@ namespace Labyrinth
             while (i < n)
             {
                 // Choix aléatoire : 0 = Walk, 1 = TurnLeft, 2 = TurnRight
-                var action = random.Next(3);
+                var action = (Action)random.Next(3);
 
                 switch (action)
                 {
-                    case 0:
+                    case Action.Walk:
                         {
                             if (crawler.FacingTile.IsTraversable)
                             {
@@ -50,11 +50,11 @@ namespace Labyrinth
                             break;
 
                         }
-                    case 1:
+                    case Action.TurnLeft:
                         crawler.Direction.TurnLeft();
                         UpdateDirection(Direction.West);
                         break;
-                    case 2:
+                    case Action.TurnRight:
                         crawler.Direction.TurnRight();
                         UpdateDirection(Direction.East);
                         break;
@@ -74,5 +74,12 @@ namespace Labyrinth
         {
             PositionChanged?.Invoke(this, new CrawlingEventArgs(crawler.X, crawler.Y, currentDirection));
         }
+    }
+
+    enum Action
+    {
+        Walk,
+        TurnLeft,
+        TurnRight
     }
 }
