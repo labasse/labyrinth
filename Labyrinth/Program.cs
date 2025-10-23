@@ -15,6 +15,7 @@ var l = new Labyrinth.Labyrinth("""
 
 
 var explorer = new RandomExplorer(l.NewCrawler());
+var lines = l.ToString().Split('\n', StringSplitOptions.None);
 
 CrawlingEventArgs? lastPoint = null;
 
@@ -22,8 +23,7 @@ explorer.PositionChanged += (s, e) =>
 {
     if (lastPoint != null)
     {
-        Console.SetCursorPosition(e.X, e.Y);
-        Console.Write(" ");
+        ClearLine(lines, lastPoint);
     }
 
     Console.SetCursorPosition(e.X, e.Y);
@@ -35,8 +35,7 @@ explorer.DirectionChanged += (s, e) =>
 {
     if (lastPoint != null)
     {
-        Console.SetCursorPosition(e.X, e.Y);
-        Console.Write(" ");
+        ClearLine(lines, lastPoint);
     }
 
     Console.SetCursorPosition(e.X, e.Y);
@@ -58,3 +57,10 @@ Console.Clear();
 Console.WriteLine(l);
 
 explorer.GetOut(5);
+
+static void ClearLine(string[] lines, CrawlingEventArgs lastPoint)
+{
+    var line = lines[lastPoint.Y];
+    Console.SetCursorPosition(lastPoint.X, lastPoint.Y);
+    Console.Write(line[lastPoint.X]);
+}
