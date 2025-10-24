@@ -1,6 +1,8 @@
 ﻿using Labyrinth.Crawl;
+using Labyrinth.Exploration;
 using Labyrinth.Items;
 using Labyrinth.Tiles;
+using Moq;
 
 namespace LabyrinthTest.Crawl;
 
@@ -287,6 +289,54 @@ public class LabyrinthCrawlerTest
         Assert.That(test.Y, Is.EqualTo(2));
         Assert.That(test.Direction, Is.EqualTo(Direction.South));
         Assert.That(test.FacingTile, Is.TypeOf<Outside>());
+    }
+    #endregion
+    
+    #region Explorer tests
+    [Test]
+    public void StopsWhenOutsideReached()
+    {
+        var mockCrawler = new Mock<ICrawler>();
+        var callCount = 0;
+
+        mockCrawler.Setup(c => c.FacingTile)
+            .Returns(() => (Tile)(callCount < 2 ? new Room() : Outside.Singleton));
+
+        mockCrawler.Setup(c => c.Walk()).Callback(() => callCount++).Returns(new Labyrinth.Items.MyInventory());
+        mockCrawler.SetupGet(c => c.Direction).Returns(Direction.North);
+
+        var rnd = new Random(0);
+        var explorer = new Explorer(mockCrawler.Object, rnd);
+
+        var result = explorer.GetOut(10);
+
+        Assert.That(result, Is.True);
+        Assert.That(callCount, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void StopsAfterMaxActionsWithoutOutside()
+    {
+        var mockCrawler = new Mock<ICrawler>();
+        mockCrawler.Setup(c => c.FacingTile).Returns(new Labyrinth.Tiles.Room());
+        mockCrawler.Setup(c => c.Walk()).Returns(new Labyrinth.Items.MyInventory());
+        mockCrawler.SetupGet(c => c.Direction).Returns(Direction.North);
+
+        var rnd = new Random(0);
+
+        var explorer = new Explorer(mockCrawler.Object, rnd);
+
+        var result = explorer.GetOut(5);
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public void ThrowsForNegativeN()
+    {
+        var mockCrawler = new Mock<ICrawler>();
+        var explorer = new Explorer(mockCrawler.Object);
+        Assert.Throws<ArgumentOutOfRangeException>(() => explorer.GetOut(-1));
     }
     #endregion
 }
