@@ -4,7 +4,9 @@ namespace Labyrinth.Build
 {
     public class AsciiParser
     {
-        public static Tile[,] Parse(string ascii_map, ref (int X, int Y) start)
+        public event EventHandler<StartEventArgs>? StartPositionFound;
+
+        public Tile[,] Parse(string ascii_map)
         {
             var lines = ascii_map.Split("\n,\r\n".Split(','), StringSplitOptions.None);
             var width = lines[0].Length;
@@ -22,7 +24,7 @@ namespace Labyrinth.Build
                 {
                     tiles[x, y] = lines[y][x] switch
                     {
-                        'x' => NewStartPos(x, y, out start),
+                        'x' => NewStartPos(x, y),
                         ' ' => new Room(),
                         '+' or '-' or '|' => Wall.Singleton,
                         '/' => km.NewDoor(),
@@ -33,9 +35,9 @@ namespace Labyrinth.Build
             }
             return tiles;
         }
-        private static Room NewStartPos(int x, int y, out (int X, int Y) start)
+        private Room NewStartPos(int x, int y)
         {
-            start = (x, y);
+            StartPositionFound?.Invoke(this, new StartEventArgs(x, y));
             return new Room();
         }
     }
