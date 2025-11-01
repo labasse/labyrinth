@@ -1,6 +1,8 @@
 ﻿using Labyrinth.Crawl;
 using Labyrinth.Tiles;
 using System.Text;
+using Labyrinth.Build;
+using Labyrinth.Events;
 
 namespace Labyrinth
 {
@@ -14,7 +16,14 @@ namespace Labyrinth
         /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
         public Labyrinth(string ascii_map)
         {
-            _tiles = Build.AsciiParser.Parse(ascii_map, ref _start);
+            // Abonnement temporaire
+            Build.AsciiParser.StartPositionFound += OnStartPositionFound;
+            
+            _tiles = Build.AsciiParser.Parse(ascii_map);
+            
+            // Désabonnement
+            AsciiParser.StartPositionFound -= OnStartPositionFound;
+            
             if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
@@ -66,6 +75,12 @@ namespace Labyrinth
         /// <returns>New crawler instance used to browse the labyrinth.</returns>
         public ICrawler NewCrawler() =>
             new LabyrinthCrawler(_start.X, _start.Y, _tiles);
+        
+        // Gestionnaire de l'événement
+        private void OnStartPositionFound(object? sender, StartEventArgs e)
+        {
+            _start = (e.X, e.Y);
+        }
 
         private (int X, int Y) _start = (-1, -1);
 
