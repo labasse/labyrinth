@@ -28,7 +28,6 @@ namespace Labyrinth.Build
                     {
                         'x' => HandleStartPos(x, y),
                         ' ' => new Room(),
-                        'O' => Outside.Singleton,
                         '+' or '-' or '|' => Wall.Singleton,
                         '/' => km.NewDoor(),
                         'k' => km.NewKeyRoom(),
