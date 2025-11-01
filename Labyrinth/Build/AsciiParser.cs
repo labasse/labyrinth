@@ -28,6 +28,7 @@ namespace Labyrinth.Build
                     {
                         'x' => HandleStartPos(x, y),
                         ' ' => new Room(),
+                        'O' => Outside.Singleton,
                         '+' or '-' or '|' => Wall.Singleton,
                         '/' => km.NewDoor(),
                         'k' => km.NewKeyRoom(),
@@ -36,11 +37,6 @@ namespace Labyrinth.Build
                 }
             }
             return tiles;
-        }
-        private static Room NewStartPos(int x, int y, out (int X, int Y) start)
-        {
-            start = (x, y);
-            return new Room();
         }
 
         private static Room HandleStartPos(int x, int y)
