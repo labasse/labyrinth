@@ -73,5 +73,7 @@ explorer.PositionChanged += (_, e) =>
 // run the explorer
 explorer.GetOut(1000);
 
-// move cursor after animation
-Console.SetCursorPosition(0, mapLines.Length + 1);
+// move cursor after animation (clamp to console buffer to avoid ArgumentOutOfRange)
+int finalTop = Math.Min(mapLines.Length + 1, Console.BufferHeight - 1);
+if (finalTop < 0) finalTop = 0;
+Console.SetCursorPosition(0, finalTop);
