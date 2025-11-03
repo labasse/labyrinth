@@ -16,6 +16,16 @@ namespace Labyrinth.Crawl
         }
 
         /// <summary>
+        /// Raised after the crawler's position changed (after a successful Walk).
+        /// </summary>
+        public event EventHandler<CrawlingEventArgs>? PositionChanged;
+
+        /// <summary>
+        /// Raised after the crawler's direction changed (after TurnLeft/TurnRight).
+        /// </summary>
+        public event EventHandler<CrawlingEventArgs>? DirectionChanged;
+
+        /// <summary>
         /// Perform up to n random moves (walk / turn left / turn right).
         /// Stops early if an Outside tile is detected in front of the crawler.
         /// Returns true if an Outside tile was reached (facing) during the process.
@@ -42,6 +52,8 @@ namespace Labyrinth.Crawl
                             if (_crawler.FacingTile.IsTraversable)
                             {
                                 _crawler.Walk();
+                                // notify listeners of position change
+                                PositionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
                             }
                         }
                         catch (InvalidOperationException)
@@ -51,9 +63,11 @@ namespace Labyrinth.Crawl
                         break;
                     case 1:
                         _crawler.Direction.TurnLeft();
+                        DirectionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
                         break;
                     case 2:
                         _crawler.Direction.TurnRight();
+                        DirectionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
                         break;
                 }
             }
