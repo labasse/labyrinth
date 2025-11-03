@@ -1,53 +1,54 @@
 using Labyrinth.Crawl;
 using Labyrinth.Items;
+using Labyrinth.Models;
 using Labyrinth.Tiles;
 
 namespace Labyrinth
 {
     public partial class Labyrinth
     {
-        private class LabyrinthCrawler(int x, int y, Tile[,] tiles) : ICrawler
+        private class LabyrinthCrawler : ICrawler
         {
-            public int X => _x;
+            private Coord _coord;
+            private Direction _direction;
+            private readonly Tile[,] _tiles;
 
-            public int Y => _y;
+            public LabyrinthCrawler(Coord coord, Direction direction, Tile[,] tiles)
+            {
+                _coord = coord;
+                _direction = direction;
+                _tiles = tiles ?? throw new ArgumentNullException(nameof(tiles));
+            }
 
-            public Tile FacingTile => ProcessFacingTile((x, y, tile) => tile);
+            public Coord Coord => _coord;
+
+            public Tile FacingTile => ProcessFacingTile((coord, tile) => tile);
 
             Direction ICrawler.Direction => _direction;
 
-            public Inventory Walk() => 
-                ProcessFacingTile((facingX, facingY, tile) => 
+            public Inventory Walk() =>
+                ProcessFacingTile((coord, tile) =>
                 {
                     var inventory = tile.Pass();
-
-                    _x = facingX;
-                    _y = facingY;
+                    _coord = coord;
                     return inventory;
                 });
 
             private bool IsOut(int pos, int dimension) =>
                 pos < 0 || pos >= _tiles.GetLength(dimension);
 
-            private T ProcessFacingTile<T>(Func<int, int, Tile, T> process)
+            private T ProcessFacingTile<T>(Func<Coord, Tile, T> process)
             {
-                int facingX = _x + _direction.DeltaX,
-                    facingY = _y + _direction.DeltaY;
+                int facingX = _coord.X + _direction.DeltaX;
+                int facingY = _coord.Y + _direction.DeltaY;
 
-                return process(
-                    facingX, facingY,
-                    IsOut(facingX, dimension: 0) ||
-                    IsOut(facingY, dimension: 1)
-                        ? Outside.Singleton
-                        : _tiles[facingX, facingY]
-                 );
+                bool outside = IsOut(facingX, dimension: 0) || IsOut(facingY, dimension: 1);
+
+                var tile = outside ? (Tile)Outside.Singleton : _tiles[facingX, facingY];
+                var facingCoord = new Coord(facingX, facingY);
+
+                return process(facingCoord, tile);
             }
-
-            private int _x = x;
-            private int _y = y;
-
-            private readonly Direction _direction = Direction.North;
-            private readonly Tile[,] _tiles = tiles;
         }
     }
 }

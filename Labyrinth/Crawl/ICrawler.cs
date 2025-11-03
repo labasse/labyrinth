@@ -1,4 +1,5 @@
 ﻿using Labyrinth.Items;
+using Labyrinth.Models;
 using Labyrinth.Tiles;
 
 namespace Labyrinth.Crawl
@@ -9,14 +10,9 @@ namespace Labyrinth.Crawl
     public interface ICrawler
     {
         /// <summary>
-        /// Gets the current X position.
+        /// Gets the current X,Y position.
         /// </summary>
-        int X { get; }
-
-        /// <summary>
-        /// Gets the current Y position.
-        /// </summary>
-        int Y { get; }
+        Coord Coord { get; }
 
         /// <summary>
         /// Gets the current direction.
