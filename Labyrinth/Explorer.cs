@@ -10,6 +10,15 @@ public class Explorer(ICrawler crawler, IRandomSource? rng = null)
     private readonly ICrawler _crawler = crawler ?? throw new ArgumentNullException(nameof(crawler));
     private readonly IRandomSource _rng = rng ?? new RandomSource();
     private enum Act { Walk = 0, TurnLeft = 1, TurnRight = 2 }
+    
+    public event EventHandler<CrawlingEventArgs>? PositionChanged;
+    public event EventHandler<CrawlingEventArgs>? DirectionChanged;
+    
+    private void OnPositionChanged() =>
+        PositionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
+    
+    private void OnDirectionChanged() =>
+        DirectionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
 
     
     /// <summary>
@@ -29,14 +38,17 @@ public class Explorer(ICrawler crawler, IRandomSource? rng = null)
                 case Act.Walk:
                     try {
                         _crawler.Walk();
+                        OnPositionChanged();
                     }
                     catch (InvalidOperationException) { /* Ignored: cannot walk into wall */ }
                     break;
                 case Act.TurnLeft:
                     _crawler.Direction.TurnLeft();
+                    OnDirectionChanged();
                     break;
                 case Act.TurnRight:
                     _crawler.Direction.TurnRight();
+                    OnDirectionChanged();
                     break;
                 default:
                     throw new System.Diagnostics.UnreachableException();

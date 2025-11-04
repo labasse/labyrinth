@@ -10,7 +10,7 @@ Pour le parser les modifications portent sur la gestion de l'évent `StartPositi
 - Suppression du paramètre ref (int X, int Y) start de la méthode Parse qui n'a plus lieu d'être.
 
  L'évent est déclaré dans le fichier Build/StartEventArgs.cs :
- ```c#
+ ```csharp
  namespace Labyrinth.Build;
 
 public class StartEventArgs(int x, int y) : EventArgs
@@ -126,3 +126,77 @@ private sealed class SequenceRandom(params int[] seq) : IRandomSource
 
 Les tests utilisent des cartes ASCII minimales pour vérifier le comportement dans des situations simples.
 Tous les tests passent avec succès.
+
+
+
+
+
+# Étape 3 – Couche présentation
+
+---
+
+Permettre d’afficher en **temps réel** les déplacements de l’explorateur dans le labyrinthe **sans modifier** la logique interne de `GetOut`, en s’appuyant sur des **événements** et une simple mise à jour visuelle dans la console.
+
+## Implémentation
+
+### `CrawlingEventArgs`
+
+Création d’une classe d’événement contenant la position et la direction actuelles :
+
+```csharp
+public sealed class CrawlingEventArgs(int x, int y, Direction direction) : EventArgs
+{
+    public int X { get; } = x;
+    public int Y { get; } = y;
+    public Direction Direction { get; } = direction;
+}
+```
+
+Elle permet de transmettre les informations nécessaires à l’affichage lors d’un déplacement ou d’un changement d’orientation.
+
+---
+
+### Événements dans `Explorer`
+
+Deux événements ont été ajoutés :
+
+```csharp
+public event EventHandler<CrawlingEventArgs>? PositionChanged;
+public event EventHandler<CrawlingEventArgs>? DirectionChanged;
+```
+
+- **PositionChanged** est déclenché après un `Walk()` réussi (nouvelle position).
+- **DirectionChanged** après un `TurnLeft()` ou `TurnRight()`.
+- Aucun événement n’est émis si le déplacement échoue (mur) ou si le crawler est déjà face à la sortie.
+
+----
+
+## Programme console
+
+Le programme principal s’abonne aux événements pour **mettre à jour la position du curseur** et afficher la direction du crawler (`^`, `>`, `v`, `<`) :
+
+
+La fonction `DrawExplorer` efface l’ancienne position et redessine le symbole à la nouvelle coordonnée via `Console.SetCursorPosition`.
+Possible d'ajouter un léger délai et rendre l’animation fluide avec un `Thread.Sleep(150);` par exemple.
+
+L'ensemble de l'implémentation de l'affichage et "la logique du jeu" est géré dans le fichier `Program.cs`. À terme on peut imaginer gérer cette logique dans une classe dédiée pour séparer les responsabilités. Dans cette partie il était demandé de faire les actions dans le programme principal j'ai donc respecté cette consigne.
+
+je n’ai pas pu utiliser un switch sur Direction, celle-ci étant une classe et non un enum (j'ai donc fait plusieurs if). Chaque propriété (North, East, etc.) crée une nouvelle instance, ce qui empêche la comparaison par constante --> j’aimerais confirmation que cette interprétation est correcte (si c'est possible d'inclure ça dans la correction merci).
+
+-----
+
+## Tests unitaires
+
+Les tests existants ont été enrichis pour vérifier :
+
+- que les événements sont bien **déclenchés au bon moment**,
+- avec les **bons arguments (X, Y, Direction)**,
+- et les informations correctes selon les actions effectuées.
+
+En plus, plusieurs fonction "utilitaires" pour les Asserts ont été ajoutées dans le fichier ExplorerTest pour faciliter la vérification des événements et éviter la duplication de code.
+
+Par exemple :
+- AssertThatArg : vérifie que les arguments d’un événement correspondent aux valeurs attendues.
+- AssertThatOutside : vérifie que l’explorateur est bien en face une tuile de type `Outside` et donc à trouver la sortie.
+
+Tous les tests passent avec succès. La phase de refactoring est OK.
