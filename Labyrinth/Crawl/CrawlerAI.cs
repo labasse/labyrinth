@@ -1,4 +1,5 @@
 using Labyrinth.Crawl;
+using Labyrinth.Events;
 using Labyrinth.Tiles;
 using Labyrinth.Items;
 
@@ -12,6 +13,10 @@ namespace Labyrinth
         private readonly ICrawler _crawler;
         private readonly Random _random = new();
 
+        // Evénements
+        public event EventHandler<CrawlingEventArgs>? PositionChanged;
+        public event EventHandler<CrawlingEventArgs>? DirectionChanged;
+        
         public CrawlerAI(ICrawler crawler)
         {
             _crawler = crawler;
@@ -26,6 +31,10 @@ namespace Labyrinth
         {
             for (int i = 0; i < n; i++)
             {
+                // Déclenche l'événement de position et direction initiale
+                OnPositionChanged();
+                OnDirectionChanged();
+                
                 // Si la tuile devant est une sortie, mission accomplie
                 if (_crawler.FacingTile is Outside)
                 {
@@ -38,19 +47,33 @@ namespace Labyrinth
                 switch (action)
                 {
                     case 0:
-                        _crawler.Walk();
+                        if (_crawler.FacingTile.IsTraversable) {
+                            _crawler.Walk();
+                            OnPositionChanged();
+                        }
                         break;
                     case 1:
                         _crawler.Direction.TurnLeft();
+                        OnDirectionChanged();
                         break;
                     case 2:
                         _crawler.Direction.TurnRight();
+                        OnDirectionChanged();
                         break;
                 }
             }
-
-            Console.WriteLine($"Aucune sortie trouvée après {n} déplacements.");
             return false;
+        }
+
+        // Méthodes pour déclencher les événements
+        protected virtual void OnPositionChanged()
+        {
+            PositionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
+        }
+
+        protected virtual void OnDirectionChanged()
+        {
+            DirectionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
         }
     }
 }
