@@ -6,19 +6,8 @@ using Labyrinth.Tiles;
 namespace LabyrinthTest.Crawl;
 
 [TestFixture(Description = "Integration test for the crawler implementation in the labyrinth")]
-public class LabyrinthCrawlerTest
+public class LabyrinthCrawlerTest : AbstractLabyrinthTest
 {
-    private static ICrawler NewCrawlerFor(string ascii_map) =>
-        new Labyrinth.Labyrinth(ascii_map).NewCrawler();
-
-    private static void AssertThat(ICrawler test, int x, int y, Direction dir, Type facingTile)
-    {
-        using var all = Assert.EnterMultipleScope();
-
-        Assert.That(test.Coord, Is.EqualTo(new Coord(x, y)));
-        Assert.That(test.Direction, Is.EqualTo(dir));
-        Assert.That(test.FacingTile, Is.TypeOf(facingTile));
-    }
 
     #region Initialization
 

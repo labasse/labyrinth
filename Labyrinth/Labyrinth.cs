@@ -10,7 +10,7 @@ namespace Labyrinth
         /// <summary>
         /// Labyrinth with walls, doors and collectable items.
         /// </summary>
-        /// <param name="ascii_map">A multiline string with '+', '-' or '|' for walls, '/' for doors, 'k' for key locations and x for starting position.</param>
+        /// <param name="ascii_map">A multiline string with '+', '-' or '|' for walls, '/' for doors, 'k' for key locations and ascii arrow for starting position and direction.</param>
         /// <exception cref="ArgumentException">Thrown when string argument reveals inconsistent map sizes or characters with no starting position.</exception>
         /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
         public Labyrinth(string ascii_map)
@@ -77,7 +77,7 @@ namespace Labyrinth
         }
 
         /// <summary>
-        /// Instantiate a new crawler at the starting position.
+        /// Instantiate a new crawler at the starting position and direction.
         /// </summary>
         /// <returns>New crawler instance used to browse the labyrinth.</returns>
         public ICrawler NewCrawler() =>
