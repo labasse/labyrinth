@@ -8,11 +8,9 @@ namespace Labyrinth.Crawl
         private readonly ICrawler _crawler;
         private readonly Random _random;
 
-        // 👉 Nouveaux évènements
+        // --- Évènements pour la couche présentation
         public event EventHandler<CrawlingEventArgs>? PositionChanged;
         public event EventHandler<CrawlingEventArgs>? DirectionChanged;
-
-    
 
         public Explorer(ICrawler crawler)
         {
@@ -21,41 +19,36 @@ namespace Labyrinth.Crawl
         }
 
         public void GetOut(int n)
-{
-    var rand = new Random();
-
-    for (int i = 0; i < n; i++)
-    {
-        // On déclenche PositionChanged avant de bouger
-        PositionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
-
-        // On effectue un mouvement aléatoire
-        int action = rand.Next(3);
-
-        if (action == 0)
         {
-            _crawler.Walk();
-        }
-        else if (action == 1)
-        {
-            _crawler.Direction.TurnLeft();
-            DirectionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
-        }
-        else
-        {
-            _crawler.Direction.TurnRight();
-            DirectionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
-        }
+            for (int i = 0; i < n; i++)
+            {
+                if (_crawler.FacingTile is Outside)
+                {
+                    Console.WriteLine("🚪 Sortie trouvée !");
+                    break;
+                }
 
-        // Arrêt si on atteint une sortie
-        if (_crawler.FacingTile is Outside)
-        {
-            Console.WriteLine("Sortie trouvée !");
-            break;
-        }
-    }
-}
+                int action = _random.Next(3); // 0 = avancer, 1 = tourner gauche, 2 = tourner droite
 
+                switch (action)
+                {
+                    case 0:
+                        _crawler.Walk();
+                        OnPositionChanged();
+                        break;
+
+                    case 1:
+                        _crawler.Direction.TurnLeft();
+                        OnDirectionChanged();
+                        break;
+
+                    case 2:
+                        _crawler.Direction.TurnRight();
+                        OnDirectionChanged();
+                        break;
+                }
+            }
+        }
 
         private void OnPositionChanged()
         {
