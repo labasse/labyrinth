@@ -66,7 +66,7 @@ namespace Labyrinth
                     res.Append(_tiles[x, y] switch
                     {
                         Room => ' ',
-                        Wall => '#',
+                        Wall w => w.Symbol,
                         Door => '/',
                         _ => throw new NotSupportedException("Unknown tile type")
                     });

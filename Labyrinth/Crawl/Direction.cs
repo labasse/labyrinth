@@ -41,6 +41,11 @@
         /// </summary>
         public void TurnLeft() => (DeltaX, DeltaY) = (DeltaY, -DeltaX);
 
+        /// <summary>
+        /// new instance but same direction
+        /// </summary>
+        public Direction Clone() => new(DeltaX, DeltaY);
+        
         #region Convenience overrides
         public void Deconstruct(out int deltaX, out int deltaY)
         {

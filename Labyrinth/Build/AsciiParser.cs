@@ -47,7 +47,9 @@ namespace Labyrinth.Build
                         tile = c switch
                         {
                             ' ' => new Room(),
-                            '+' or '-' or '|' => Wall.Singleton,
+                            '+' => Wall.Corner,
+                            '-' => Wall.Horizontal,
+                            '|' => Wall.Vertical,
                             '/' => km.NewDoor(),
                             'k' => km.NewKeyRoom(),
                             _ => throw new ArgumentException(
