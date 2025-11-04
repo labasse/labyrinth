@@ -1,4 +1,5 @@
 using System;
+using Labyrinth.Items;
 using Labyrinth.Tiles;
 
 namespace Labyrinth.Crawl
@@ -19,49 +20,42 @@ namespace Labyrinth.Crawl
         {
             for (var i = 0; i < n; i++)
             {
-                if (_crawler.FacingTile is Outside)
+                if (FacingOutside())
                 {
                     return true;
                 }
 
                 var action = _random.Next(3);
-                if (action == 0)
+                switch (action)
                 {
-                    if (_crawler.FacingTile.IsTraversable)
-                    {
-                        _crawler.Walk();
-                        OnPositionChanged();
-                        if (_crawler.FacingTile is Outside)
+                    case 0:
+                        if (TryMove())
                         {
                             return true;
                         }
-                    }
+                        break;
+                    case 1:
+                        _crawler.Direction.TurnLeft();
+                        OnDirectionChanged();
+                        break;
+                    case 2:
+                        _crawler.Direction.TurnRight();
+                        OnDirectionChanged();
+                        break;
                 }
-                else if (action == 1)
+
+                if (FacingOutside())
                 {
-                    _crawler.Direction.TurnLeft();
-                    OnDirectionChanged();
-                    if (_crawler.FacingTile is Outside)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    _crawler.Direction.TurnRight();
-                    OnDirectionChanged();
-                    if (_crawler.FacingTile is Outside)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
-            return _crawler.FacingTile is Outside;
+            return FacingOutside();
         }
 
         private readonly ICrawler _crawler;
         private readonly Random _random;
+        private readonly MyInventory _bag = new();
 
         private void OnPositionChanged() =>
             PositionChanged?.Invoke(this, NewArgs());
@@ -71,5 +65,38 @@ namespace Labyrinth.Crawl
 
         private CrawlingEventArgs NewArgs() =>
             new(_crawler.X, _crawler.Y, _crawler.Direction);
+
+        private bool TryMove()
+        {
+            if (_crawler.FacingTile is Door door)
+            {
+                TryOpenDoor(door);
+            }
+
+            if (!_crawler.FacingTile.IsTraversable)
+            {
+                return false;
+            }
+
+            var inventory = _crawler.Walk();
+            if (!_bag.HasItem && inventory.HasItem)
+            {
+                _bag.MoveItemFrom(inventory);
+            }
+
+            OnPositionChanged();
+            return FacingOutside();
+        }
+
+        private void TryOpenDoor(Door door)
+        {
+            if (!door.IsTraversable && _bag.HasItem)
+            {
+                door.Open(_bag);
+            }
+        }
+
+        private bool FacingOutside() =>
+            _crawler.FacingTile is Outside;
     }
 }

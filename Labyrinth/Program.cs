@@ -33,6 +33,11 @@ var lastY = crawler.Y;
 
 void Draw(CrawlingEventArgs args)
 {
+    if (!InBounds(args.X, args.Y))
+    {
+        return;
+    }
+
     Console.SetCursorPosition(args.X, args.Y);
     Console.Write(DirectionSymbol(args.Direction));
 }
@@ -48,8 +53,7 @@ char DirectionSymbol(Direction direction) => direction switch
 
 void Update(CrawlingEventArgs args)
 {
-    Console.SetCursorPosition(lastX, lastY);
-    Console.Write(lines[lastY][lastX]);
+    Restore(lastX, lastY);
     lastX = args.X;
     lastY = args.Y;
     Draw(args);
@@ -60,4 +64,24 @@ explorer.DirectionChanged += (_, args) => Draw(args);
 
 Draw(new CrawlingEventArgs(crawler.X, crawler.Y, crawler.Direction));
 explorer.GetOut(2000);
-Console.SetCursorPosition(0, lines.Length + 1);
+var bottom = Math.Clamp(lines.Length + 1, 0, Console.BufferHeight > 0 ? Console.BufferHeight - 1 : 0);
+Console.SetCursorPosition(0, bottom);
+
+bool InBounds(int x, int y) =>
+    x >= 0 &&
+    y >= 0 &&
+    y < lines.Length &&
+    x < lines[y].Length &&
+    x < Console.BufferWidth &&
+    y < Console.BufferHeight;
+
+void Restore(int x, int y)
+{
+    if (!InBounds(x, y))
+    {
+        return;
+    }
+
+    Console.SetCursorPosition(x, y);
+    Console.Write(lines[y][x]);
+}
