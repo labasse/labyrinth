@@ -337,5 +337,38 @@ public class LabyrinthCrawlerTest
         var explorer = new Explorer(mockCrawler.Object);
         Assert.Throws<ArgumentOutOfRangeException>(() => explorer.GetOut(-1));
     }
+    
+    [Test]
+    public void OnStartAndDuringExploration()
+    {
+        var mockCrawler = new Mock<ICrawler>();
+        var direction = Direction.North;
+        var tile = new Room();
+        int walkCount = 0;
+
+        mockCrawler.SetupGet(c => c.Direction).Returns(direction);
+        mockCrawler.SetupGet(c => c.X).Returns(1);
+        mockCrawler.SetupGet(c => c.Y).Returns(2);
+        mockCrawler.Setup(c => c.FacingTile)
+            .Returns(() => walkCount < 2 ? tile : Outside.Singleton);
+        mockCrawler.Setup(c => c.Walk()).Callback(() => walkCount++).Returns(new Labyrinth.Items.MyInventory());
+
+        var explorer = new Explorer(mockCrawler.Object, new Random(0));
+
+        var positions = new List<(int x, int y, Direction dir)>();
+        var directions = new List<(int x, int y, Direction dir)>();
+
+        explorer.PositionChanged += (_, e) => positions.Add((e.X, e.Y, e.Direction));
+        explorer.DirectionChanged += (_, e) => directions.Add((e.X, e.Y, e.Direction));
+
+        bool result = explorer.GetOut(10);
+
+        Assert.That(result, Is.True);
+        Assert.That(positions.Count, Is.GreaterThan(0), "PositionChanged doit être déclenché au moins une fois");
+        Assert.That(directions.Count, Is.GreaterThan(0), "DirectionChanged doit être déclenché au moins une fois");
+
+        Assert.That(positions.All(p => p.x == 1 && p.y == 2 && p.dir == Direction.North), Is.True);
+        Assert.That(directions.All(d => d.x == 1 && d.y == 2 && d.dir == Direction.North), Is.True);
+    }
     #endregion
 }
