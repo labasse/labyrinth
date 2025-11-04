@@ -4,12 +4,17 @@ namespace Labyrinth.Build
 {
     public class AsciiParser
     {
-        public static Tile[,] Parse(string ascii_map, ref (int X, int Y) start)
+        /// <summary>
+        /// Evènement levé à chaque rencontre d'un 'x' dans la carte.
+        /// </summary>
+        public event EventHandler<StartEventArgs>? StartPositionFound;
+
+        public Tile[,] Parse(string ascii_map)
         {
             var lines = ascii_map.Split("\n,\r\n".Split(','), StringSplitOptions.None);
             var width = lines[0].Length;
             var tiles = new Tile[width, lines.Length];
-            
+
             using var km = new Keymaster();
 
             for (int y = 0; y < tiles.GetLength(1); y++)
@@ -20,22 +25,26 @@ namespace Labyrinth.Build
                 }
                 for (int x = 0; x < tiles.GetLength(0); x++)
                 {
-                    tiles[x, y] = lines[y][x] switch
+                    char c = lines[y][x];
+                    tiles[x, y] = c switch
                     {
-                        'x' => NewStartPos(x, y, out start),
+                        'x' =>
+                            // raise event then return a Room
+                            RaiseStartAndReturnRoom(x, y),
                         ' ' => new Room(),
                         '+' or '-' or '|' => Wall.Singleton,
                         '/' => km.NewDoor(),
                         'k' => km.NewKeyRoom(),
-                        _ => throw new ArgumentException($"Invalid map: unknown character '{lines[y][x]}' at line {y}, col {x}.")
+                        _ => throw new ArgumentException($"Invalid map: unknown character '{c}' at line {y}, col {x}.")
                     };
                 }
             }
             return tiles;
         }
-        private static Room NewStartPos(int x, int y, out (int X, int Y) start)
+
+        private Room RaiseStartAndReturnRoom(int x, int y)
         {
-            start = (x, y);
+            StartPositionFound?.Invoke(this, new StartEventArgs(x, y));
             return new Room();
         }
     }
