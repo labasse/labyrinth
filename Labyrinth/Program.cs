@@ -16,7 +16,7 @@ var laby = new Labyrinth.Labyrinth("""
 var crawler = laby.NewCrawler();
 var explorer = new Explorer(crawler);
 
-// S'abonner aux évènements
+// S'abonner aux évènements (position et direction)
 explorer.PositionChanged += (s, e) =>
 {
     Console.SetCursorPosition(e.X, e.Y);
@@ -32,10 +32,11 @@ explorer.DirectionChanged += (s, e) =>
 // Démarrer l'exploration
 explorer.GetOut(50);
 
+// Fonction pour afficher la direction du crawler
 static char GetArrow(Direction d)
 {
     if (d == Direction.North) return '^';
     if (d == Direction.East) return '>';
     if (d == Direction.South) return 'v';
-    return '<';
+    return '<'; // West
 }
