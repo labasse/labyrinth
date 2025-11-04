@@ -11,6 +11,10 @@ namespace Labyrinth.Crawl
             _random = random ?? Random.Shared;
         }
 
+        public event EventHandler<CrawlingEventArgs>? PositionChanged;
+
+        public event EventHandler<CrawlingEventArgs>? DirectionChanged;
+
         public bool GetOut(int n)
         {
             for (var i = 0; i < n; i++)
@@ -26,15 +30,30 @@ namespace Labyrinth.Crawl
                     if (_crawler.FacingTile.IsTraversable)
                     {
                         _crawler.Walk();
+                        OnPositionChanged();
+                        if (_crawler.FacingTile is Outside)
+                        {
+                            return true;
+                        }
                     }
                 }
                 else if (action == 1)
                 {
                     _crawler.Direction.TurnLeft();
+                    OnDirectionChanged();
+                    if (_crawler.FacingTile is Outside)
+                    {
+                        return true;
+                    }
                 }
                 else
                 {
                     _crawler.Direction.TurnRight();
+                    OnDirectionChanged();
+                    if (_crawler.FacingTile is Outside)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -43,5 +62,14 @@ namespace Labyrinth.Crawl
 
         private readonly ICrawler _crawler;
         private readonly Random _random;
+
+        private void OnPositionChanged() =>
+            PositionChanged?.Invoke(this, NewArgs());
+
+        private void OnDirectionChanged() =>
+            DirectionChanged?.Invoke(this, NewArgs());
+
+        private CrawlingEventArgs NewArgs() =>
+            new(_crawler.X, _crawler.Y, _crawler.Direction);
     }
 }
