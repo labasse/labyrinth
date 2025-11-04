@@ -4,6 +4,7 @@ using Labyrinth.Tiles;
 
 namespace Labyrinth
 {
+
     public partial class Labyrinth
     {
         private class LabyrinthCrawler(int x, int y, Tile[,] tiles) : ICrawler
@@ -16,8 +17,8 @@ namespace Labyrinth
 
             Direction ICrawler.Direction => _direction;
 
-            public Inventory Walk() => 
-                ProcessFacingTile((facingX, facingY, tile) => 
+            public Inventory Walk() =>
+                ProcessFacingTile((facingX, facingY, tile) =>
                 {
                     var inventory = tile.Pass();
 
