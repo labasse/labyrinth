@@ -5,7 +5,6 @@ namespace Labyrinth.Build
 {
     public class AsciiParser
     {
-        // 👉 Définition de l'évènement
         public event EventHandler<StartEventArgs>? StartPositionFound;
 
         public Tile[,] Parse(string ascii_map)
@@ -40,7 +39,6 @@ namespace Labyrinth.Build
 
         private Room HandleStartPos(int x, int y)
         {
-            // 👉 Déclenchement de l'évènement
             StartPositionFound?.Invoke(this, new StartEventArgs(x, y));
             return new Room();
         }
