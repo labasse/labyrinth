@@ -1,4 +1,5 @@
 ﻿using Labyrinth.Crawl;
+using Labyrinth.Events;
 using Labyrinth.Tiles;
 
 namespace Labyrinth.Exploration
@@ -26,39 +27,90 @@ namespace Labyrinth.Exploration
             _crawler = crawler ?? throw new ArgumentNullException(nameof(crawler));
             _random = random ?? new Random();
         }
+        
+        public event EventHandler<CrawlingEventArgs>? PositionChanged;
+        public event EventHandler<CrawlingEventArgs>? DirectionChanged;
+        
+        public event EventHandler<CrawlingEventArgs>? ExitFound;
+
+        private void OnPositionChanged() =>
+            PositionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
+        private void OnDirectionChanged() =>
+            DirectionChanged?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
+        
+        private void OnExitFound() =>
+            ExitFound?.Invoke(this, new CrawlingEventArgs(_crawler.X, _crawler.Y, _crawler.Direction));
 
         /// <summary>
         /// Randomly walks through the labyrinth up to <paramref name="n"/> steps
         /// or stops when an <see cref="Outside"/> tile is reached.
         /// </summary>
         /// <param name="n">The maximum number of moves to perform.</param>
-        public bool GetOut(int n)
+        public void GetOut(int n)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(n);
+            
+            OnPositionChanged();
+            OnDirectionChanged();
 
             for (var i = 0; i < n; i++)
             {
-                if (_crawler.FacingTile is Outside)
-                    return true;
+                if (TryTriggerExit())
+                    break;
 
-                var action = _random.Next(3);
-
-                switch (action)
-                {
-                    case 0:
-                        _crawler.Walk();
-                        if (_crawler.FacingTile is Outside) return true;
-                        break;
-                    case 1:
-                        _crawler.Direction.TurnLeft();
-                        break;
-                    case 2:
-                        _crawler.Direction.TurnRight();
-                        break;
-                }
+                PerformRandomAction();
+                
+                Thread.Sleep(10);
             }
+        }
+        
+        private bool TryTriggerExit()
+        {
+            if (_crawler.FacingTile is not Outside) return false;
+            OnExitFound();
+            return true;
+        }
+        
+        private void PerformRandomAction()
+        {
+            var action = _random.Next(3);
+            switch (action)
+            {
+                case 0:
+                    _crawler.Direction.TurnLeft();
+                    OnDirectionChanged();
+                    break;
+                case 1:
+                    _crawler.Direction.TurnRight();
+                    OnDirectionChanged();
+                    break;
+                case 2:
+                    TryWalkForward();
+                    break;
+            }
+        }
 
-            return false;
+        private void TryWalkForward()
+        {
+            try
+            {
+                _crawler.Walk();
+                OnPositionChanged();
+                TryTriggerExit();
+            }
+            catch (InvalidOperationException)
+            {
+                TurnRandomly();
+            }
+        }
+
+        private void TurnRandomly()
+        {
+            if (_random.Next(2) == 0)
+                _crawler.Direction.TurnLeft();
+            else
+                _crawler.Direction.TurnRight();
+            OnDirectionChanged();
         }
     }
 }
