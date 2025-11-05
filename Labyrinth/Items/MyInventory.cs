@@ -1,14 +1,14 @@
 ﻿namespace Labyrinth.Items
 {
     /// <summary>
-    /// Inventory class that exposes the item it contains.
+    /// Inventory class that exposes the Items it contains.
     /// </summary>
-    /// <param name="item">Optional initial item in the inventory.</param>
-    public class MyInventory(ICollectable? item = null) : Inventory(item)
+    /// <param name="Items">Optional initial Items in the inventory.</param>
+    public class MyInventory(ICollectable? Items = null) : Inventory(Items)
     {
         /// <summary>
-        /// Item in the inventory, or null if empty.
+        /// Items in the inventory, or null if empty.
         /// </summary>
-        public ICollectable? Item => _item;
+        public IEnumerable<ICollectable> Items => _items;
     }
 }

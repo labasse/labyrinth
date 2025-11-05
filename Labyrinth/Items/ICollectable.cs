@@ -1,7 +1,7 @@
 ﻿namespace Labyrinth.Items
 {
     /// <summary>
-    /// A collectable item in the labyrinth.
+    /// A collectable Items in the labyrinth.
     /// </summary>
     public interface ICollectable
     {

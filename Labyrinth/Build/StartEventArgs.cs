@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Pipes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Labyrinth.Build
 {
-    public class  StartEventArgs : EventArgs
-    {
-
-        public int X { get; }
-        public int Y { get; }
-        public StartEventArgs(int x, int y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
+	/// <summary>
+	/// Provides data for an event that is triggered when a start position is found.
+	/// </summary>
+	/// <param name="x">X coordinate of the starting position</param>
+	/// <param name="y">Y coordinate of the starting position</param>
+	public class StartEventArgs(int x, int y) : EventArgs
+	{
+		public int X { get; } = x;
+		public int Y { get; } = y;
     }
-
 }

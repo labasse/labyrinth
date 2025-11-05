@@ -5,7 +5,7 @@ namespace Labyrinth.Tiles
     /// <summary>
     /// Base class for all tiles in the labyrinth.
     /// </summary>
-    public abstract class Tile(ICollectable? item = null)
+    public abstract class Tile(ICollectable? Items = null)
     {
         /// <summary>
         /// Gets a value indicating whether the tile can be traversed.
@@ -26,6 +26,6 @@ namespace Labyrinth.Tiles
             return LocalInventory;
         }
 
-        protected MyInventory LocalInventory { get; private init; } = new (item);
+        protected MyInventory LocalInventory { get; private init; } = new (Items);
     }
 }

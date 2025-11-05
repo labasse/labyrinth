@@ -6,10 +6,10 @@ namespace Labyrinth.Tiles
     /// A room in the labyrinth.
     /// </summary>
     /// <remarks>
-    /// Initialize a new room, optionally with a collectable item.
+    /// Initialize a new room, optionally with a collectable Items.
     /// </remarks>
-    /// <param name="item">Item in the room</param>
-    public class Room(ICollectable? item = null) : Tile(item)
+    /// <param name="Items">Items in the room</param>
+    public class Room(ICollectable? Items = null) : Tile(Items)
     {
         public override bool IsTraversable => true;
     }
