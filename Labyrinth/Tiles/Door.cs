@@ -20,7 +20,7 @@ namespace Labyrinth.Tiles
         /// <summary>
         /// True if the door is locked, false if unlocked and opened.
         /// </summary>
-        public bool IsLocked => !LocalInventory.HasItem; // A key in the door
+        public bool IsLocked => !LocalInventory.HasItems; // A key in the door
 
         /// <summary>
         /// Opens the door with the provided key.

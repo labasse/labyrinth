@@ -4,11 +4,11 @@
     /// Inventory class that exposes the item it contains.
     /// </summary>
     /// <param name="item">Optional initial item in the inventory.</param>
-    public class MyInventory(ICollectable? item = null) : Inventory(item)
+    public class MyInventory(IEnumerable<ICollectable>? items = null) : Inventory(items)
     {
         /// <summary>
         /// Item in the inventory, or null if empty.
         /// </summary>
-        public ICollectable? Item => _item;
+        public IEnumerable<ICollectable>? Item => _items;
     }
 }

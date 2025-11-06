@@ -26,6 +26,6 @@ namespace Labyrinth.Tiles
             return LocalInventory;
         }
 
-        protected MyInventory LocalInventory { get; private init; } = new (item);
+        protected MyInventory LocalInventory { get; private init; } = new([item]);
     }
 }
