@@ -28,7 +28,7 @@ namespace Labyrinth
                 if (_crawler.FacingTile.IsTraversable
                     && _rnd.Next() == Actions.Walk)
                 {
-                    _crawler.Walk().SwapItems(bag);
+                    bag.MoveAllItemsFrom(_crawler.Walk());
                     changeEvent = PositionChanged;
                 }
                 else
@@ -37,7 +37,7 @@ namespace Labyrinth
                     changeEvent = DirectionChanged;
                 }
                 if (_crawler.FacingTile is Door door && door.IsLocked
-                    && bag.HasItems && bag.ItemType.First() == typeof(Key))
+                    && bag.HasItems && bag.ItemType.Contains(typeof(Key)))
                 {
                     door.Open(bag);
                 }

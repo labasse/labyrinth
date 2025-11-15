@@ -295,7 +295,7 @@ public class ExplorerTest
             out var events,
             Actions.Walk,// key
             Actions.Walk,
-            Actions.Walk,// swap keys
+            Actions.Walk,// ramasse une autre clé
             Actions.Walk // door
         );
         var left = test.GetOut(10);

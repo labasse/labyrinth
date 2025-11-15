@@ -35,11 +35,20 @@ namespace Labyrinth.Tiles
             {
                 throw new InvalidOperationException("Door is already unlocked.");
             }
-            LocalInventory.MoveItemFrom(keySource);
-            if (LocalInventory.Items.First() != _key)
+            LocalInventory.MoveAllItemsFrom(keySource);
+            if (LocalInventory.Items.Contains(_key))
             {
-                keySource.MoveItemFrom(LocalInventory);
+                var keyIndex = LocalInventory.Items.FindIndex(item => item == _key);
+                var key =  LocalInventory.Items[keyIndex];
+                LocalInventory.Items.RemoveAt(keyIndex);
+                keySource.MoveAllItemsFrom(LocalInventory);
+                LocalInventory.Items.Add(key);
             }
+            else
+            {
+                keySource.MoveAllItemsFrom(LocalInventory);
+            }
+            
             return IsOpened;
         }
 

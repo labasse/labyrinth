@@ -31,6 +31,7 @@ namespace Labyrinth.Items
         /// Places an item in the inventory, removing it from another one.
         /// </summary>
         /// <param name="from">The inventory from which the item is taken. The item is removed from this inventory.</param>
+        /// <param name="nth"></param>
         /// <exception cref="InvalidOperationException">Thrown if the room already contains an item (check with <see cref="HasItem"/>).</exception>
         [MemberNotNull(nameof(_items))]
         public void MoveItemFrom(Inventory from, int nth = 0)
@@ -45,13 +46,14 @@ namespace Labyrinth.Items
             from._items.Remove(fromElement);
         }
 
-        /// <summary>
-        /// Swaps items between inventories (if any)
-        /// </summary>
-        /// <param name="from">The inventory to swap item from</param>
-        public void SwapItems(Inventory from)
+        public void MoveAllItemsFrom(Inventory from)
         {
-            (_items, from._items) = (from._items, _items);
+            if (from._items == null)
+            {
+                throw new InvalidOperationException("No item to take from the source inventory");
+            }
+            _items.InsertRange(0, from._items);
+            from._items.Clear();
         }
 
         protected List<ICollectable> _items = item != null ? [item] : [];
