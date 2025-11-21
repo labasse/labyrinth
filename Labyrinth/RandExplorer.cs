@@ -9,7 +9,7 @@ namespace Labyrinth
     {
         private readonly ICrawler _crawler = crawler;
         private readonly IEnumRandomizer<Actions> _rnd = rnd;
-        
+
         public enum Actions
         {
             TurnLeft,
@@ -37,7 +37,7 @@ namespace Labyrinth
                     changeEvent = DirectionChanged;
                 }
                 if (_crawler.FacingTile is Door door && door.IsLocked
-                    && bag.HasItem && bag.ItemType == typeof(Key))
+                    && bag.HasItems && bag.ItemTypes.First() == typeof(Key))
                 {
                     door.Open(bag);
                 }

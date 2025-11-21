@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Labyrinth.Items
 {
@@ -9,49 +9,58 @@ namespace Labyrinth.Items
     public abstract class Inventory(ICollectable? item = null)
     {
         /// <summary>
-        /// True if the room has an item, false otherwise.
+        /// True if the inventory has items, false otherwise.
         /// </summary>
-        [MemberNotNullWhen(true, nameof(_item))]
-        public bool HasItem => _item != null;
+        [MemberNotNullWhen(true, nameof(_items))]
+        public bool HasItems => _items != null && _items.Count > 0;
 
         /// <summary>
-        /// Gets the type of the item in the room.
+        /// Gets the types of the items in the inventory.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if the room has no item (check with <see cref="HasItem"/>).</exception>
-        public Type ItemType => _item?.GetType() ?? throw new InvalidOperationException("No item in the room");
+        /// <exception cref="InvalidOperationException">Thrown if the inventory has no items (check with <see cref="HasItems"/>).</exception>
+        public IEnumerable<Type> ItemTypes
+        {
+            get
+            {
+                if (!HasItems)
+                {
+                    throw new InvalidOperationException("No items in the inventory");
+                }
+                return _items.Select(i => i.GetType());
+            }
+        }
 
         /// <summary>
-        /// Places an item in the inventory, removing it from another one.
+        /// Moves the nth item from another inventory to this one.
         /// </summary>
         /// <param name="from">The inventory from which the item is taken. The item is removed from this inventory.</param>
-        /// <exception cref="InvalidOperationException">Thrown if the room already contains an item (check with <see cref="HasItem"/>).</exception>
-        [MemberNotNull(nameof(_item))]
-        public void MoveItemFrom(Inventory from)
+        /// <param name="nth">The zero-based index of the item to take (default is 0 for the first item).</param>
+        /// <exception cref="InvalidOperationException">Thrown if the source inventory has no items at the specified index.</exception>
+        public void MoveItemFrom(Inventory from, int nth = 0)
         {
-            if (HasItem)
+            if (!from.HasItems || nth >= from._items.Count)
             {
-                throw new InvalidOperationException("Room already has an item.");
+                throw new InvalidOperationException("No item to take from the source inventory at the specified index");
             }
-            if (!from.HasItem)
-            {
-                throw new InvalidOperationException("No item to take from the source inventory");
-            }
-            _item = from._item;
-            from._item = null;
+
+            var item = from._items[nth];
+            from._items.RemoveAt(nth);
+
+            _items ??= new List<ICollectable>();
+            _items.Add(item);
         }
 
         /// <summary>
         /// Swaps items between inventories (if any)
         /// </summary>
-        /// <param name="from">The inventory to swap item from</param>
+        /// <param name="from">The inventory to swap items with</param>
         public void SwapItems(Inventory from)
         {
-            var tmp = _item;
-
-            _item = from._item;
-            from._item = tmp;
+            var tmp = _items;
+            _items = from._items;
+            from._items = tmp;
         }
 
-        protected ICollectable? _item = item;
+        protected List<ICollectable>? _items = item != null ? new List<ICollectable> { item } : null;
     }
 }
