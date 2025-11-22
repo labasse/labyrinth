@@ -44,54 +44,68 @@ public class RoomTest
     }
 
     [Test]
-    public void RoomAfterSwapWithKeyInventoryHasKey()
+    public void RoomAfterReceivingKeyFromInventoryHasKey()
     {
+        // Arrange
         var room = new Room();
         var keyInventory = new MyInventory(new Key());
 
-        room.Pass().SwapItems(keyInventory);
+        // Act
+        room.Pass().MoveItemFrom(keyInventory);
 
+        // Assert
         using var all = Assert.EnterMultipleScope();
         Assert.That(room.HasKey, Is.True);
         Assert.That(keyInventory.HasItems, Is.False);
     }
 
     [Test]
-    public void RoomWithKeyAfterSwapWithEmptyInventoryHasNoKey()
+    public void RoomWithKeyAfterReceivingNonKeyItemStillHasKeyInInventory()
     {
-        var room = new Room(new Key());
-        var emptyInventory = new MyInventory();
-
-        room.Pass().SwapItems(emptyInventory);
-
-        using var all = Assert.EnterMultipleScope();
-        Assert.That(room.HasKey, Is.False);
-        Assert.That(emptyInventory.HasKey, Is.True);
-    }
-
-    [Test]
-    public void RoomWithKeyAfterSwapWithNonKeyInventoryHasNoKey()
-    {
+        // Arrange
         var room = new Room(new Key());
         var fakeItemInventory = new MyInventory(new FakeItem());
 
-        room.Pass().SwapItems(fakeItemInventory);
+        // Act
+        room.Pass().MoveItemFrom(fakeItemInventory);
 
+        // Assert
         using var all = Assert.EnterMultipleScope();
-        Assert.That(room.HasKey, Is.False);
-        Assert.That(fakeItemInventory.HasKey, Is.True);
+        Assert.That(room.HasKey, Is.True);
+        Assert.That(((MyInventory)room.Pass()).Items.Count(), Is.EqualTo(2));
+        Assert.That(fakeItemInventory.HasItems, Is.False);
     }
 
     [Test]
-    public void RoomWithNonKeyItemAfterSwapWithKeyInventoryHasKey()
+    public void RoomWithKeyAfterGivingKeyToInventoryHasNoKey()
     {
+        // Arrange
+        var room = new Room(new Key());
+        var targetInventory = new MyInventory();
+
+        // Act
+        targetInventory.MoveItemFrom(room.Pass());
+
+        // Assert
+        using var all = Assert.EnterMultipleScope();
+        Assert.That(room.HasKey, Is.False);
+        Assert.That(targetInventory.HasKey, Is.True);
+    }
+
+    [Test]
+    public void RoomWithNonKeyItemAfterReceivingKeyHasKey()
+    {
+        // Arrange
         var room = new Room(new FakeItem());
         var keyInventory = new MyInventory(new Key());
 
-        room.Pass().SwapItems(keyInventory);
+        // Act
+        room.Pass().MoveItemFrom(keyInventory);
 
+        // Assert
         using var all = Assert.EnterMultipleScope();
         Assert.That(room.HasKey, Is.True);
+        Assert.That(((MyInventory)room.Pass()).Items.Count(), Is.EqualTo(2));
         Assert.That(keyInventory.HasKey, Is.False);
     }
 

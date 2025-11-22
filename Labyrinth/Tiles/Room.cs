@@ -14,10 +14,9 @@ namespace Labyrinth.Tiles
         public override bool IsTraversable => true;
 
         /// <summary>
-        /// True if the room contains a key (a room can only contain one item at a time).
+        /// True if the room contains at least one key.
         /// </summary>
-        public bool HasKey => LocalInventory.HasItems &&
-        LocalInventory.ItemTypes.First() == typeof(Key);
+        public bool HasKey => LocalInventory.HasItems && LocalInventory.ItemTypes.Any(type => type == typeof(Key));
     }
 
 

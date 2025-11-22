@@ -15,33 +15,33 @@ public class MyInventoryTest
     [Test]
     public void EmptyInventoryHasNoKey()
     {
-        
+
         var inventory = new MyInventory();
 
-        
+
         var result = inventory.HasKey;
 
-        
+
         Assert.That(result, Is.False);
     }
 
     [Test]
     public void InventoryWithKeyHasKey()
     {
-        
+
         var inventory = new MyInventory(new Key());
 
-        
+
         var result = inventory.HasKey;
 
-        
+
         Assert.That(result, Is.True);
     }
 
     [Test]
     public void InventoryWithNonKeyItemHasNoKey()
     {
-        
+
         var inventory = new MyInventory(new FakeItem());
 
         var result = inventory.HasKey;
@@ -52,7 +52,7 @@ public class MyInventoryTest
     [Test]
     public void InventoryWithMultipleKeysHasKey()
     {
-        
+
         var inventory = new MyInventory(new Key());
         var source = new MyInventory(new Key());
 
@@ -66,7 +66,7 @@ public class MyInventoryTest
     [Test]
     public void InventoryWithKeyAndOtherItemHasKey()
     {
-        
+
         var inventory = new MyInventory(new Key());
         var source = new MyInventory(new FakeItem());
 
@@ -82,24 +82,27 @@ public class MyInventoryTest
     {
         var inventory = new MyInventory(new FakeItem());
         var source = new MyInventory(new FakeItem());
-        
+
         inventory.MoveItemFrom(source);
-        
+
         using var all = Assert.EnterMultipleScope();
         Assert.That(inventory.HasKey, Is.False);
         Assert.That(inventory.Items.Count(), Is.EqualTo(2));
     }
 
     [Test]
-    public void InventoryWithKeyThenSwappedWithEmptyHasNoKey()
+    public void InventoryWithKeyAfterMovingToAnotherInventoryHasNoKey()
     {
+        // Arrange
         var inventory = new MyInventory(new Key());
-        var emptyInventory = new MyInventory();
+        var targetInventory = new MyInventory();
 
-        inventory.SwapItems(emptyInventory);
+        // Act
+        targetInventory.MoveItemFrom(inventory);
 
+        // Assert
         using var all = Assert.EnterMultipleScope();
         Assert.That(inventory.HasKey, Is.False);
-        Assert.That(emptyInventory.HasKey, Is.True);
+        Assert.That(targetInventory.HasKey, Is.True);
     }
 }
