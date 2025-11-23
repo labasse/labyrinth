@@ -14,10 +14,11 @@ namespace Labyrinth
     /// </summary>
     /// <param name="crawler">Crawler instance used to navigate the labyrinth.</param>
     /// <param name="rnd">Randomizer that decides the next action.</param>
-    public class RandExplorer(ICrawler crawler, IEnumRandomizer<RandExplorer.Actions> rnd)
+    public class RandExplorer(ICrawler crawler, IEnumRandomizer<RandExplorer.Actions> rnd, IDoorOpeningStrategy doorOpener)
     {
         private readonly ICrawler _crawler = crawler;
         private readonly IEnumRandomizer<Actions> _rnd = rnd;
+        private readonly IDoorOpeningStrategy _doorOpener = doorOpener;
 
         /// <summary>
         /// Possible actions performed by the explorer.
@@ -70,46 +71,13 @@ namespace Labyrinth
 
                 if (_crawler.FacingTile is Door door && door.IsLocked && bag.HasItems)
                 {
-                    TryOpenDoorWithCollectedKeys(door, bag);
+                    _doorOpener.TryOpen(door, bag);
                 }
 
                 changeEvent?.Invoke(this, new CrawlingEventArgs(_crawler));
             }
 
             return n;
-        }
-
-        /// <summary>
-        /// Attempts to unlock the specified door using any key found in the explorer's inventory.
-        /// Tries keys in order of collection, stopping when the correct one is used.
-        /// Wrong keys are returned to the explorer's inventory.
-        /// </summary>
-        /// <param name="door">The door to open.</param>
-        /// <param name="bag">Explorer's inventory containing all collected items.</param>
-        private static void TryOpenDoorWithCollectedKeys(Door door, MyInventory bag)
-        {
-            var temp = new MyInventory();
-
-            var keysToTry = bag.Items.OfType<Key>().Count();
-
-            for (int i = 0; i < keysToTry && door.IsLocked; i++)
-            {
-                var itemsList = bag.Items.ToList();
-                int keyIndex = itemsList.FindIndex(item => item is Key);
-                if (keyIndex < 0)
-                {
-                    break;
-                }
-
-                temp.MoveItemFrom(bag, keyIndex);
-
-                bool opened = door.Open(temp);
-
-                if (!opened)
-                {
-                    bag.MoveItemFrom(temp);
-                }
-            }
         }
 
         /// <summary>

@@ -28,8 +28,9 @@ var crawler = labyrinth.NewCrawler();
 var prevX = crawler.X;
 var prevY = crawler.Y;
 var explorer = new RandExplorer(
-    crawler, 
-    new BasicEnumRandomizer<RandExplorer.Actions>()
+    crawler,
+    new BasicEnumRandomizer<RandExplorer.Actions>(),
+    new TryAllKeysDoorOpeningStrategy()
 );
 
 explorer.DirectionChanged += DrawExplorer;

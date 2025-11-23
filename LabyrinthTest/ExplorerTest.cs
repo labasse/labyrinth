@@ -41,7 +41,8 @@ public class ExplorerTest
         );
         var explorer = new RandExplorer(
             laby.NewCrawler(),
-            mockRnd.Object
+            mockRnd.Object,
+            new TryAllKeysDoorOpeningStrategy()
         );
         events = new ExplorerEventsCatcher(explorer);
         return explorer;
