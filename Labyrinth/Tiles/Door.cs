@@ -1,4 +1,6 @@
-﻿using Labyrinth.Items;
+﻿using System;
+using System.Linq;
+using Labyrinth.Items;
 
 namespace Labyrinth.Tiles
 {
@@ -8,7 +10,7 @@ namespace Labyrinth.Tiles
     public class Door : Tile
     {
         public Door() : base(new Key()) =>
-            _key = (Key)LocalInventory.Item!;
+            _key = (Key)LocalInventory.Items.First();
 
         public override bool IsTraversable => IsOpened;
 
@@ -20,7 +22,7 @@ namespace Labyrinth.Tiles
         /// <summary>
         /// True if the door is locked, false if unlocked and opened.
         /// </summary>
-        public bool IsLocked => !LocalInventory.HasItem; // A key in the door
+        public bool IsLocked => !LocalInventory.HasItems; // A key in the door
 
         /// <summary>
         /// Opens the door with the provided key.
@@ -28,18 +30,23 @@ namespace Labyrinth.Tiles
         /// <param name="keySource">Inventory containing the key to open the door.</param>
         /// <returns>True if the key opens the door, false otherwise.</returns>
         /// <remarks>The key is removed from the inventory only if it opens the door.</remarks>
-        /// <exception cref="InvalidOperationException">The door is already opened (check with <see cref="IsOpened"/>).</exception>"
+        /// <exception cref="InvalidOperationException">The door is already opened (check with <see cref="IsOpened"/>).</exception>
         public bool Open(Inventory keySource)
         {
             if (IsOpened)
             {
                 throw new InvalidOperationException("Door is already unlocked.");
             }
+
+            // Take the first item from the source by default
             LocalInventory.MoveItemFrom(keySource);
-            if (LocalInventory.Item != _key)
+
+            // If it's not the right key, give it back
+            if (LocalInventory.Items.First() != _key)
             {
                 keySource.MoveItemFrom(LocalInventory);
             }
+
             return IsOpened;
         }
 
