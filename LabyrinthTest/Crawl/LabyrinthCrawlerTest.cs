@@ -159,7 +159,7 @@ public class LabyrinthCrawlerTest
         );
         var inventory = test.Walk();
 
-        Assert.That(inventory.HasItem, Is.False);
+        Assert.That(inventory.HasItems, Is.False);
         AssertThat(test,
             x: 1, y: 1,
             Direction.North,
@@ -180,7 +180,7 @@ public class LabyrinthCrawlerTest
 
         var inventory = test.Walk();
 
-        Assert.That(inventory.HasItem, Is.False);
+        Assert.That(inventory.HasItems, Is.False);
         AssertThat(test,
             x: 2, y: 1,
             Direction.East,
@@ -239,8 +239,8 @@ public class LabyrinthCrawlerTest
 
         using var all = Assert.EnterMultipleScope();
 
-        Assert.That(inventory.HasItem, Is.True);
-        Assert.That(inventory.ItemType, Is.EqualTo(typeof(Key)));
+        Assert.That(inventory.HasItems, Is.True);
+        Assert.That(inventory.ItemTypes.First(), Is.EqualTo(typeof(Key)));
     }
 
     [Test]
@@ -259,7 +259,7 @@ public class LabyrinthCrawlerTest
         Assert.That(door.Open(inventory), Is.False);
         Assert.That(door.IsLocked, Is.True);
         Assert.That(door.IsTraversable, Is.False);
-        Assert.That(inventory.HasItem, Is.True);
+        Assert.That(inventory.HasItems, Is.True);
     }
 
     [Test]
@@ -287,6 +287,34 @@ public class LabyrinthCrawlerTest
         Assert.That(test.Y, Is.EqualTo(2));
         Assert.That(test.Direction, Is.EqualTo(Direction.South));
         Assert.That(test.FacingTile, Is.TypeOf<Outside>());
+    }
+
+    [Test]
+    public void MultipleDoorsThenKeysAreHandled()
+    {
+        Assert.DoesNotThrow(() =>
+            new Labyrinth.Labyrinth("""
+            +----+
+            |// k|
+            |k x |
+            +----+
+            """
+            )
+        );
+    }
+
+    [Test]
+    public void MultipleKeysThenDoorsAreHandled()
+    {
+        Assert.DoesNotThrow(() =>
+            new Labyrinth.Labyrinth("""
+            +----+
+            |kk /|
+            |/ x |
+            +----+
+            """
+            )
+        );
     }
     #endregion
 }

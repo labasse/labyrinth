@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Labyrinth.Items;
+﻿using Labyrinth.Items;
 
 namespace Labyrinth.Tiles
 {
