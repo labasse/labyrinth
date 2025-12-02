@@ -241,6 +241,7 @@ public class LabyrinthCrawlerTest
 
         Assert.That(inventory.HasItems, Is.True);
         Assert.That(inventory.ItemTypes, Is.EqualTo(typeof(Key)));
+
     }
 
     [Test]

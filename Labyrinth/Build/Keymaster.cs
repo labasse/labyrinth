@@ -1,5 +1,6 @@
 ﻿using Labyrinth.Items;
 using Labyrinth.Tiles;
+using System.Collections.Generic;
 
 namespace Labyrinth.Build
 {
@@ -8,13 +9,16 @@ namespace Labyrinth.Build
     /// </summary>
     public sealed class Keymaster : IDisposable
     {
+        private readonly Queue<Door> pendingDoors = new();
+        private readonly Queue<Room> pendingKeyRooms = new();
+
         /// <summary>
         /// Ensure all created doors have a corresponding key room and vice versa.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Some keys are missing or are not placed.</exception>
+        /// <exception cref="InvalidOperationException">Some keys or doors are unmatched.</exception>
         public void Dispose()
         {
-            if (unplacedKey.HasItems || emptyKeyRoom is not null)
+            if (pendingDoors.Count > 0 || pendingKeyRooms.Count > 0)
             {
                 throw new InvalidOperationException("Unmatched key/door creation");
             }
@@ -24,17 +28,24 @@ namespace Labyrinth.Build
         /// Create a new door and place its key in a previously created empty key room (if any).
         /// </summary>
         /// <returns>Created door</returns>
-        /// <exception cref="NotSupportedException">Multiple doors before key placement</exception>
         public Door NewDoor()
         {
-            if (unplacedKey.HasItems)
-            {
-                throw new NotSupportedException("Unable to handle multiple doors before key placement");
-            }
             var door = new Door();
 
-            door.LockAndTakeKey(unplacedKey);
-            PlaceKey();
+            if (pendingKeyRooms.Count > 0)
+            {
+                // Associer immédiatement une clé
+                var room = pendingKeyRooms.Dequeue();
+                var keyInventory = new MyInventory(new Key());
+                door.LockAndTakeKey(keyInventory);
+                room.Pass().MoveItemFrom(keyInventory);
+            }
+            else
+            {
+                // Mettre la porte en attente
+                pendingDoors.Enqueue(door);
+            }
+
             return door;
         }
 
@@ -42,28 +53,25 @@ namespace Labyrinth.Build
         /// Create a new room with key and place the key if a door was previously created.
         /// </summary>
         /// <returns>Created key room</returns>
-        /// <exception cref="NotSupportedException">Multiple keyss before key placement</exception>
         public Room NewKeyRoom()
         {
-            if (emptyKeyRoom is not null)
+            var room = new Room();
+
+            if (pendingDoors.Count > 0)
             {
-                throw new NotSupportedException("Unable to handle multiple keys before door creation");
+                // Associer immédiatement une clé
+                var door = pendingDoors.Dequeue();
+                var keyInventory = new MyInventory(new Key());
+                door.LockAndTakeKey(keyInventory);
+                room.Pass().MoveItemFrom(keyInventory);
             }
-            var room = emptyKeyRoom = new Room();
-            PlaceKey();
+            else
+            {
+                // Mettre la salle en attente
+                pendingKeyRooms.Enqueue(room);
+            }
+
             return room;
         }
-
-        private void PlaceKey()
-        {
-            if (unplacedKey.HasItems && emptyKeyRoom is not null)
-            {
-                emptyKeyRoom.Pass().MoveItemFrom(unplacedKey);
-                emptyKeyRoom = null;
-            }
-        }
-
-        private readonly MyInventory unplacedKey = new();
-        private Room? emptyKeyRoom = null;
     }
 }
