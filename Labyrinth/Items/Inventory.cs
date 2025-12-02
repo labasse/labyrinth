@@ -46,18 +46,6 @@ namespace Labyrinth.Items
             from._items = from._items.Where((_, index) => index != nth);
         }
 
-        /// <summary>
-        /// Swaps items between inventories (if any)
-        /// </summary>
-        /// <param name="from">The inventory to swap items from</param>
-        public void SwapItems(Inventory from)
-        {
-            var tmp = _items;
-
-            _items = from._items;
-            from._items = tmp;
-        }
-
         protected IEnumerable<ICollectable>? _items = items ?? Enumerable.Empty<ICollectable>();
     }
 }

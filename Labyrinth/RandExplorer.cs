@@ -28,7 +28,11 @@ namespace Labyrinth
                 if (_crawler.FacingTile.IsTraversable
                     && _rnd.Next() == Actions.Walk)
                 {
-                    _crawler.Walk().SwapItems(bag);
+                    var roomInventory = _crawler.Walk();
+                    if (roomInventory.HasItems)
+                    {
+                        bag.MoveItemFrom(roomInventory);
+                    }
                     changeEvent = PositionChanged;
                 }
                 else
@@ -37,13 +41,37 @@ namespace Labyrinth
                     changeEvent = DirectionChanged;
                 }
                 if (_crawler.FacingTile is Door door && door.IsLocked
-                    && bag.HasItems && bag.ItemTypes.Contains(typeof(Key)))
+                    && bag.HasItems)
                 {
-                    door.Open(bag);
+                    OpenDoorWithTheRightKeyInBag(door, bag);
                 }
                 changeEvent?.Invoke(this, new CrawlingEventArgs(_crawler));
             }
             return n;
+        }
+
+        private void OpenDoorWithTheRightKeyInBag(Door door, MyInventory bag)
+        {
+            if (bag.Items != null)
+            {
+                var keyCount = bag.Items.Count(item => item is Key);
+
+                for (int attempt = 0; attempt < keyCount && door.IsLocked; attempt++)
+                {
+                    var keyIndex = bag.Items
+                        .Select((item, index) => new { item, index })
+                        .First(x => x.item is Key)
+                        .index;
+
+                    var tempInventory = new MyInventory();
+                    tempInventory.MoveItemFrom(bag, keyIndex);
+
+                    if (!door.Open(tempInventory))
+                    {
+                        bag.MoveItemFrom(tempInventory);
+                    }
+                }
+            }
         }
 
         public event EventHandler<CrawlingEventArgs>? PositionChanged;
