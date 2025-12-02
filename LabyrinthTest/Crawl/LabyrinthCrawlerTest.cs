@@ -1,6 +1,7 @@
 ﻿using Labyrinth.Crawl;
 using Labyrinth.Items;
 using Labyrinth.Tiles;
+using System.Linq;
 
 namespace LabyrinthTest.Crawl;
 
@@ -147,6 +148,7 @@ public class LabyrinthCrawlerTest
             typeof(Door)
         );
     }
+
     [Test]
     public void WalkReturnsInventoryAndChangesPositionAndFacingTile()
     {
@@ -241,8 +243,6 @@ public class LabyrinthCrawlerTest
 
         Assert.That(inventory.HasItems, Is.True);
         Assert.That(inventory.ItemTypes.First(), Is.EqualTo(typeof(Key)));
-
-
     }
 
     [Test]
@@ -262,6 +262,7 @@ public class LabyrinthCrawlerTest
         Assert.That(door.IsLocked, Is.True);
         Assert.That(door.IsTraversable, Is.False);
         Assert.That(inventory.HasItems, Is.True);
+        Assert.That(inventory.ItemTypes.First(), Is.EqualTo(typeof(Key)));
     }
 
     [Test]
@@ -279,7 +280,8 @@ public class LabyrinthCrawlerTest
         var inventory = test.Walk();
 
         test.Direction.TurnRight();
-        ((Door)test.FacingTile).Open(inventory);
+        var door = (Door)test.FacingTile;
+        Assert.That(door.Open(inventory), Is.True); // la bonne clé ouvre
 
         test.Walk();
 

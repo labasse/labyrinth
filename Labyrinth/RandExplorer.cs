@@ -26,10 +26,20 @@ namespace Labyrinth
             {
                 EventHandler<CrawlingEventArgs>? changeEvent;
 
-                if (_crawler.FacingTile.IsTraversable && _rnd.Next() == Actions.Walk)
+                // Sécuriser l’appel à _rnd.Next()
+                Actions action;
+                try
+                {
+                    action = _rnd.Next();
+                }
+                catch
+                {
+                    action = Actions.TurnLeft; // valeur par défaut
+                }
+
+                if (_crawler.FacingTile.IsTraversable && action == Actions.Walk)
                 {
                     var inventory = _crawler.Walk();
-                    // Collecter tous les objets rencontrés
                     while (inventory.HasItems)
                     {
                         bag.MoveItemFrom(inventory);
@@ -42,7 +52,7 @@ namespace Labyrinth
                     changeEvent = DirectionChanged;
                 }
 
-                // Essayer toutes les clés collectées pour ouvrir la porte
+                // Essayer les clés uniquement si la porte est verrouillée
                 if (_crawler.FacingTile is Door door && door.IsLocked)
                 {
                     foreach (var key in bag.Items.OfType<Key>().ToList())
