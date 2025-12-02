@@ -240,7 +240,8 @@ public class LabyrinthCrawlerTest
         using var all = Assert.EnterMultipleScope();
 
         Assert.That(inventory.HasItems, Is.True);
-        Assert.That(inventory.ItemTypes, Is.EqualTo(typeof(Key)));
+        Assert.That(inventory.ItemTypes.First(), Is.EqualTo(typeof(Key)));
+
 
     }
 
