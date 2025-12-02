@@ -2,6 +2,7 @@
 using Labyrinth.Items;
 using Labyrinth.Sys;
 using Labyrinth.Tiles;
+using System.Linq;
 
 namespace Labyrinth
 {
@@ -19,16 +20,20 @@ namespace Labyrinth
         public int GetOut(int n)
         {
             ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(n, 0, "n must be strictly positive");
-            MyInventory bag = new ();
+            MyInventory bag = new();
 
-            for( ; n > 0 && _crawler.FacingTile is not Outside; n--)
+            for (; n > 0 && _crawler.FacingTile is not Outside; n--)
             {
                 EventHandler<CrawlingEventArgs>? changeEvent;
 
-                if (_crawler.FacingTile.IsTraversable
-                    && _rnd.Next() == Actions.Walk)
+                if (_crawler.FacingTile.IsTraversable && _rnd.Next() == Actions.Walk)
                 {
-                    _crawler.Walk().SwapItems(bag);
+                    var inventory = _crawler.Walk();
+                    // Collecter tous les objets rencontrés
+                    while (inventory.HasItems)
+                    {
+                        bag.MoveItemFrom(inventory);
+                    }
                     changeEvent = PositionChanged;
                 }
                 else
@@ -36,19 +41,25 @@ namespace Labyrinth
                     _crawler.Direction.TurnLeft();
                     changeEvent = DirectionChanged;
                 }
-                if (_crawler.FacingTile is Door door && door.IsLocked
-                    && bag.HasItems && bag.ItemTypes == typeof(Key))
+
+                // Essayer toutes les clés collectées pour ouvrir la porte
+                if (_crawler.FacingTile is Door door && door.IsLocked)
                 {
-                    door.Open(bag);
+                    foreach (var key in bag.Items.OfType<Key>().ToList())
+                    {
+                        if (door.Open(new MyInventory(key)))
+                        {
+                            break;
+                        }
+                    }
                 }
+
                 changeEvent?.Invoke(this, new CrawlingEventArgs(_crawler));
             }
             return n;
         }
 
         public event EventHandler<CrawlingEventArgs>? PositionChanged;
-
         public event EventHandler<CrawlingEventArgs>? DirectionChanged;
     }
-
 }
