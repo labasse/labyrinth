@@ -235,12 +235,12 @@ public class LabyrinthCrawlerTest
         +---+
         """
         );
-        //var inventory = test.Walk();
+        var inventory = test.Walk();
 
-        //using var all = Assert.EnterMultipleScope();
+        using var all = Assert.EnterMultipleScope();
 
-        //Assert.That(inventory.HasItems, Is.True);
-        //Assert.That(inventory.ItemTypes, Does.Contain(typeof(Key)));
+        Assert.That(inventory.HasItems, Is.True);
+        Assert.That(inventory.ItemTypes, Does.Contain(typeof(Key)));
     }
 
     [Test]

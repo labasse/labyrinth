@@ -6,19 +6,22 @@ namespace Labyrinth.Items
     /// Inventory of collectable items for rooms and players.
     /// </summary>
     /// <param name="item">Optional initial items in the inventory.</param>
-    public abstract class Inventory(IEnumerable<ICollectable>? items = null)
+    public abstract class Inventory(IEnumerable<ICollectable>? items)
     {
         /// <summary>
         /// True if the room has an item, false otherwise.
         /// </summary>
         [MemberNotNullWhen(true, nameof(_items))]
-        public bool HasItems => _items.Any();
+        public bool HasItems => _items != null && _items.Any();
 
         /// <summary>
         /// Gets the type of the item in the room.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown if the room has no item (check with <see cref="HasItem"/>).</exception>
-        public IEnumerable<Type> ItemTypes => _items?.Select(x => x.GetType()) ?? throw new InvalidOperationException("No item in the room");
+        public IEnumerable<Type> ItemTypes => !HasItems
+                    ? throw new InvalidOperationException("No item in the room")
+                    : _items.Select(x => x.GetType());
+        
 
         /// <summary>
         /// Places an item in the inventory, removing it from another one.
@@ -39,8 +42,8 @@ namespace Labyrinth.Items
                 throw new IndexOutOfRangeException("nth is out of range");
             }
 
-            _items.ToList().Add(from._items.ElementAt(nth));
-            from._items.ToList().RemoveAt(nth);
+            _items = _items.Append(from._items.ElementAt(nth)).AsEnumerable();
+            from._items = from._items.Where((_, index) => index != nth);
         }
 
         /// <summary>

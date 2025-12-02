@@ -14,9 +14,6 @@ namespace Labyrinth.Build
         /// <exception cref="InvalidOperationException">Some keys are missing or are not placed.</exception>
         public void Dispose()
         {
-            Console.WriteLine(unplacedKey.HasItems);
-            Console.WriteLine(emptyKeyRoom);
-            Console.WriteLine(emptyKeyRoom is not null);
             if (unplacedKey.HasItems || emptyKeyRoom is not null)
             {
                 throw new InvalidOperationException("Unmatched key/door creation");
@@ -59,9 +56,6 @@ namespace Labyrinth.Build
 
         private void PlaceKey()
         {
-            Console.WriteLine("test : " + unplacedKey.Item.Count());
-            Console.WriteLine(unplacedKey.HasItems);
-            Console.WriteLine(emptyKeyRoom is not null);
             if (unplacedKey.HasItems && emptyKeyRoom is not null)
             {
                 emptyKeyRoom.Pass().MoveItemFrom(unplacedKey);
@@ -70,6 +64,6 @@ namespace Labyrinth.Build
         }
 
         private readonly MyInventory unplacedKey = new();
-        private Room? emptyKeyRoom = new();
+        private Room? emptyKeyRoom = null;
     }
 }
