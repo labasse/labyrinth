@@ -39,6 +39,11 @@ namespace Labyrinth.Build
             return door;
         }
 
+        /// <summary>
+        /// Creates a new "key" room, adds it to the queue of pending rooms, 
+        /// and attempts to match it with other existing rooms if possible.
+        /// </summary>
+        /// <returns>The newly created room</returns>
         public Room NewKeyRoom()
         {
             var room = new Room();
