@@ -49,12 +49,7 @@ namespace Labyrinth.Items
         /// Swaps all items between inventories.
         /// </summary>
         /// <param name="from">The inventory to swap items with.</param>
-        public void SwapItems(Inventory from)
-        {
-            var tmp = _items;
-            _items = from._items;
-            from._items = tmp;
-        }
+        
 
         /// <summary>
         /// Internal list of items contained in the inventory.
