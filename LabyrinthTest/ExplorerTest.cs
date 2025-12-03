@@ -305,4 +305,40 @@ public class ExplorerTest
         Assert.That(events.PositionChangedCount , Is.EqualTo(4));
         Assert.That(events.LastArgs, Is.EqualTo((3, 2, Direction.East)));
     }
+
+    [Test]
+    public void GetOutPassingMultipleKeysBeforeDoors()
+    {
+        var test = NewExplorerFor("""
+            +----+
+            |kx //
+            |k   |
+            | | /|
+            |kk/ |
+            +----+
+            """,
+            out var events,
+            Actions.Walk,   
+            Actions.Walk,       
+            Actions.Walk,       
+            Actions.Walk,       
+            Actions.Walk,   
+            Actions.Walk,       
+            Actions.Walk,
+            Actions.Walk,
+            Actions.Walk,
+            Actions.Walk,
+            Actions.TurnLeft,
+            Actions.TurnLeft,
+            Actions.Walk  
+        );
+
+        var left = test.GetOut(20);
+
+        Assert.That(left, Is.EqualTo(2));
+        Assert.That(events.DirectionChangedCount, Is.EqualTo(7));
+        Assert.That(events.PositionChangedCount,  Is.EqualTo(11));
+        Assert.That(events.LastArgs, Is.EqualTo((5, 1, Direction.East)));
+    }
+
 }

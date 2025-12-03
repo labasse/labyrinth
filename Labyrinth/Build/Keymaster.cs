@@ -27,10 +27,6 @@ namespace Labyrinth.Build
         /// <exception cref="NotSupportedException">Multiple doors before key placement</exception>
         public Door NewDoor()
         {
-            if (unplacedKey.HasItems)
-            {
-                throw new NotSupportedException("Unable to handle multiple doors before key placement");
-            }
             var door = new Door();
 
             door.LockAndTakeKey(unplacedKey);
