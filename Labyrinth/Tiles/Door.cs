@@ -39,7 +39,6 @@ namespace Labyrinth.Tiles
             if (!IsLocked)
                 throw new InvalidOperationException("Door is already unlocked.");
 
-            // déplacer la clé vers l’inventaire cible
             whereKeyGoes.MoveItemFrom(LocalInventory);
         }
 
