@@ -229,19 +229,18 @@ public class LabyrinthCrawlerTest
     public void WalkInARoomWithAnItem()
     {
         var test = NewCrawlerFor("""
-        +---+
-        |  k|
-        |/ x|
-        +---+
-        """
-        );
+                                 +---+
+                                 |  k|
+                                 |/ x|
+                                 +---+
+                                 """);
         var inventory = test.Walk();
 
         using var all = Assert.EnterMultipleScope();
-
         Assert.That(inventory.HasItems, Is.True);
-        Assert.That(inventory.ItemTypes, Does.Contain(typeof(Key)));
+        Assert.That(inventory.ItemTypes, Is.EquivalentTo(new[] { typeof(Key) }));
     }
+
 
     [Test]
     public void WalkUseAWrongKeyToOpenADoor()
