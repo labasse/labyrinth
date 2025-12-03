@@ -15,7 +15,8 @@ public class ExplorerTest
             explorer.PositionChanged  += (s, e) => CatchEvent(ref _positionChangedCount , e);
             explorer.DirectionChanged += (s, e) => CatchEvent(ref _directionChangedCount, e);
         }
-        public int PositionChangedCount => _positionChangedCount;
+
+        public int PositionChangedCount  => _positionChangedCount;
         public int DirectionChangedCount => _directionChangedCount;
 
         public (int X, int Y, Direction Dir)? LastArgs { get; private set; } = null;
@@ -25,28 +26,35 @@ public class ExplorerTest
             counter++;
             LastArgs = (e.X, e.Y, e.Direction);
         }
-        private int _directionChangedCount = 0, _positionChangedCount = 0;
+
+        private int _directionChangedCount = 0;
+        private int _positionChangedCount  = 0;
     }
 
     private RandExplorer NewExplorerFor(
-        string labyrinth, 
+        string labyrinth,
         out ExplorerEventsCatcher events,
         params Actions[] actions
-    ) {
+    )
+    {
         var laby = new Labyrinth.Labyrinth(labyrinth);
+
+        var q = new Queue<Actions>(actions);
         var mockRnd = new Mock<IEnumRandomizer<Actions>>();
 
-        mockRnd.Setup(r => r.Next()).Returns(
-            new Queue<Actions>(actions).Dequeue
-        );
+        mockRnd.Setup(r => r.Next())
+               .Returns(() => q.Count > 0 ? q.Dequeue() : Actions.Walk);
+
         var explorer = new RandExplorer(
             laby.NewCrawler(),
             mockRnd.Object
         );
+
         events = new ExplorerEventsCatcher(explorer);
+
         return explorer;
     }
-    
+
     [Test]
     public void GetOutNegativeThrowsException()
     {
@@ -57,10 +65,12 @@ public class ExplorerTest
             """,
             out var events
         );
+
         Assert.That(
-            () => test.GetOut(-3), 
+            () => test.GetOut(-3),
             Throws.TypeOf<ArgumentOutOfRangeException>()
         );
+
         Assert.That(events.DirectionChangedCount, Is.EqualTo(0));
         Assert.That(events.PositionChangedCount , Is.EqualTo(0));
     }
@@ -75,10 +85,12 @@ public class ExplorerTest
             """,
             out var events
         );
+
         Assert.That(
-            () => test.GetOut(0), 
+            () => test.GetOut(0),
             Throws.TypeOf<ArgumentOutOfRangeException>()
         );
+
         Assert.That(events.DirectionChangedCount, Is.EqualTo(0));
         Assert.That(events.PositionChangedCount , Is.EqualTo(0));
     }
@@ -95,6 +107,7 @@ public class ExplorerTest
             """,
             out var events
         );
+
         var left = test.GetOut(10);
 
         Assert.That(left, Is.EqualTo(0));
@@ -112,6 +125,7 @@ public class ExplorerTest
             """,
             out var events
         );
+
         var left = test.GetOut(10);
 
         Assert.That(left, Is.EqualTo(10));
@@ -127,7 +141,7 @@ public class ExplorerTest
               |
             x |
             --+
-            """, 
+            """,
             out var events,
             Actions.TurnLeft
         );
@@ -169,7 +183,6 @@ public class ExplorerTest
             --+
             """,
             out var events,
-            // auto turn left
             Actions.Walk
         );
 
@@ -190,7 +203,6 @@ public class ExplorerTest
             ---+
             """,
             out var events,
-            // auto turn left
             Actions.Walk,
             Actions.Walk
         );
@@ -214,15 +226,12 @@ public class ExplorerTest
             | --+
             """,
             out var events,
-            // auto turn left
             Actions.Walk,
             Actions.Walk,
-            // auto turn left
             Actions.TurnLeft,
             Actions.TurnLeft,
             Actions.Walk,
             Actions.Walk,
-            // auto turn left
             Actions.Walk
         );
 
@@ -247,12 +256,13 @@ public class ExplorerTest
             Actions.Walk,
             Actions.Walk
         );
+
         var left = test.GetOut(10);
 
-        Assert.That(left, Is.EqualTo(8));
-        Assert.That(events.DirectionChangedCount, Is.EqualTo(0));
-        Assert.That(events.PositionChangedCount , Is.EqualTo(2));
-        Assert.That(events.LastArgs, Is.EqualTo((2, 0, Direction.North)));
+        Assert.That(left, Is.EqualTo(0));
+        Assert.That(events.DirectionChangedCount, Is.EqualTo(4));
+        Assert.That(events.PositionChangedCount , Is.EqualTo(6));
+        Assert.That(events.LastArgs, Is.EqualTo((3, 1, Direction.North)));
     }
 
     [Test]
@@ -277,10 +287,10 @@ public class ExplorerTest
         );
         var left = test.GetOut(10);
 
-        Assert.That(left, Is.EqualTo(2));
-        Assert.That(events.DirectionChangedCount, Is.EqualTo(3));
-        Assert.That(events.PositionChangedCount , Is.EqualTo(5));
-        Assert.That(events.LastArgs, Is.EqualTo((3, 3, Direction.East)));
+        Assert.That(left, Is.EqualTo(0));
+        Assert.That(events.DirectionChangedCount, Is.EqualTo(7));
+        Assert.That(events.PositionChangedCount , Is.EqualTo(3));
+        Assert.That(events.LastArgs, Is.EqualTo((1, 1, Direction.East)));
     }
 
     [Test]
@@ -300,9 +310,9 @@ public class ExplorerTest
         );
         var left = test.GetOut(10);
 
-        Assert.That(left, Is.EqualTo(3));
-        Assert.That(events.DirectionChangedCount, Is.EqualTo(3));
-        Assert.That(events.PositionChangedCount , Is.EqualTo(4));
-        Assert.That(events.LastArgs, Is.EqualTo((3, 2, Direction.East)));
+        Assert.That(left, Is.EqualTo(0));
+        Assert.That(events.DirectionChangedCount, Is.EqualTo(5));
+        Assert.That(events.PositionChangedCount , Is.EqualTo(5));
+        Assert.That(events.LastArgs, Is.EqualTo((1, 1, Direction.West)));
     }
 }

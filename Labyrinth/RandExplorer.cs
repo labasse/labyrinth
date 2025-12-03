@@ -11,7 +11,7 @@ namespace Labyrinth
     {
         private readonly ICrawler _crawler = crawler;
         private readonly IEnumRandomizer<Actions> _rnd = rnd;
-        
+
         public enum Actions
         {
             TurnLeft,
@@ -27,10 +27,12 @@ namespace Labyrinth
             {
                 EventHandler<CrawlingEventArgs>? changeEvent;
 
-                if (_crawler.FacingTile.IsTraversable
-                    && _rnd.Next() == Actions.Walk)
+                if (_crawler.FacingTile.IsTraversable && _rnd.Next() == Actions.Walk)
                 {
-                    _crawler.Walk().SwapItems(bag);
+                    _crawler.Walk();
+
+                    CollectTileInventory(bag, _crawler.FacingTile);
+
                     changeEvent = PositionChanged;
                 }
                 else
@@ -38,19 +40,38 @@ namespace Labyrinth
                     _crawler.Direction.TurnLeft();
                     changeEvent = DirectionChanged;
                 }
-                if (_crawler.FacingTile is Door door && door.IsLocked
-                                                     && bag.HasItems && bag.ItemTypes.Contains(typeof(Key)))
+
+                if (_crawler.FacingTile is Door door && door.IsLocked)
                 {
-                    door.Open(bag);
+                    TryOpenDoor(door, bag);
                 }
+
                 changeEvent?.Invoke(this, new CrawlingEventArgs(_crawler));
             }
+
             return n;
         }
 
-        public event EventHandler<CrawlingEventArgs>? PositionChanged;
+        private static void CollectTileInventory(Inventory bag, Tile tile)
+        {
+            while (tile.LocalInventory.HasItems)
+            {
+                bag.MoveItemFrom(tile.LocalInventory, 0);
+            }
+        }
 
+        private static void TryOpenDoor(Door door, Inventory bag)
+        {
+            while (door.IsLocked && bag.HasItems)
+            {
+                // Chaque tentative déplace la clé puis
+                // le Door.Open la rend à l'inventaire si mauvaise
+                // ou la garde si bonne
+                door.Open(bag);
+            }
+        }
+
+        public event EventHandler<CrawlingEventArgs>? PositionChanged;
         public event EventHandler<CrawlingEventArgs>? DirectionChanged;
     }
-
 }
