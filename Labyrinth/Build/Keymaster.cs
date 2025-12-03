@@ -14,7 +14,7 @@ namespace Labyrinth.Build
         /// <exception cref="InvalidOperationException">Some keys are missing or are not placed.</exception>
         public void Dispose()
         {
-            if (unplacedKey.HasItems || emptyKeyRoom is not null)
+            if (unplacedKey.HasItems || emptyKeyRooms.Any())
             {
                 throw new InvalidOperationException("Unmatched key/door creation");
             }
@@ -45,25 +45,23 @@ namespace Labyrinth.Build
         /// <exception cref="NotSupportedException">Multiple keyss before key placement</exception>
         public Room NewKeyRoom()
         {
-            if (emptyKeyRoom is not null)
-            {
-                throw new NotSupportedException("Unable to handle multiple keys before door creation");
-            }
-            var room = emptyKeyRoom = new Room();
+            var room = new Room();
+            emptyKeyRooms.Add(room);
             PlaceKey();
             return room;
         }
 
         private void PlaceKey()
         {
-            if (unplacedKey.HasItems && emptyKeyRoom is not null)
+            while (unplacedKey.HasItems && emptyKeyRooms.Count > 0)
             {
-                emptyKeyRoom.Pass().MoveItemFrom(unplacedKey);
-                emptyKeyRoom = null;
+                var room = emptyKeyRooms[0];
+                room.Pass().MoveItemFrom(unplacedKey, 0);
+                emptyKeyRooms.RemoveAt(0);
             }
         }
 
         private readonly MyInventory unplacedKey = new();
-        private Room? emptyKeyRoom = null;
+         private readonly List<Room> emptyKeyRooms = new();
     }
 }
