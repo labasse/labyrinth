@@ -1,4 +1,6 @@
-﻿using Labyrinth.Crawl;
+﻿using System;
+using System.Linq;
+using Labyrinth.Crawl;
 using Labyrinth.Items;
 using Labyrinth.Sys;
 using Labyrinth.Tiles;
@@ -37,7 +39,7 @@ namespace Labyrinth
                     changeEvent = DirectionChanged;
                 }
                 if (_crawler.FacingTile is Door door && door.IsLocked
-                    && bag.HasItem && bag.ItemType == typeof(Key))
+                                                     && bag.HasItems && bag.ItemTypes.Contains(typeof(Key)))
                 {
                     door.Open(bag);
                 }

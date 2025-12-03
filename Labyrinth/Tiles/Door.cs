@@ -1,59 +1,60 @@
-﻿using Labyrinth.Items;
+﻿using System;
+using System.Linq;
+using Labyrinth.Items;
 
 namespace Labyrinth.Tiles
 {
-    /// <summary>
-    /// A door tile in the labyrinth either locked with no key or opened with key (no "closed and unlocked" state).
-    /// </summary>
     public class Door : Tile
     {
-        public Door() : base(new Key()) =>
-            _key = (Key)LocalInventory.Item!;
+        public Door() : base(new Key())
+        {
+            // On capture la clé propre à cette porte.
+            _key = LocalInventory.Items.OfType<Key>().Single();
+        }
 
         public override bool IsTraversable => IsOpened;
 
-        /// <summary>
-        /// True if the door is opened, false if closed and locked.
-        /// </summary>
         public bool IsOpened => !IsLocked;
 
-        /// <summary>
-        /// True if the door is locked, false if unlocked and opened.
-        /// </summary>
-        public bool IsLocked => !LocalInventory.HasItem; // A key in the door
+        public bool IsLocked =>
+            // Verrouillée si la clé de cette porte n’est pas dans l’inventaire local.
+            !LocalInventory.Items.OfType<Key>().Any(k => ReferenceEquals(k, _key));
 
-        /// <summary>
-        /// Opens the door with the provided key.
-        /// </summary>
-        /// <param name="keySource">Inventory containing the key to open the door.</param>
-        /// <returns>True if the key opens the door, false otherwise.</returns>
-        /// <remarks>The key is removed from the inventory only if it opens the door.</remarks>
-        /// <exception cref="InvalidOperationException">The door is already opened (check with <see cref="IsOpened"/>).</exception>"
         public bool Open(Inventory keySource)
         {
             if (IsOpened)
             {
                 throw new InvalidOperationException("Door is already unlocked.");
             }
-            LocalInventory.MoveItemFrom(keySource);
-            if (LocalInventory.Item != _key)
+
+            // On déplace le premier item de la source vers la porte.
+            LocalInventory.MoveItemFrom(keySource, 0);
+
+            // Si après ça la porte ne contient toujours pas sa clé spécifique, on a
+            // utilisé une mauvaise clé : on la renvoie dans la source.
+            if (!LocalInventory.Items.OfType<Key>().Any(k => ReferenceEquals(k, _key)))
             {
-                keySource.MoveItemFrom(LocalInventory);
+                keySource.MoveItemFrom(LocalInventory, 0);
+                return false;
             }
-            return IsOpened;
+
+            return true;
         }
 
-        /// <summary>
-        /// Lock the door and removes the key.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The door is already closed (check with <see cref="IsLocked"/>).</exception>
         public void LockAndTakeKey(Inventory whereKeyGoes)
         {
             if (IsLocked)
             {
                 throw new InvalidOperationException("Door is already locked.");
             }
-            whereKeyGoes.MoveItemFrom(LocalInventory);
+
+            // On trouve l’index de la clé de cette porte dans LocalInventory
+            var keyIndex = LocalInventory.Items
+                .Select((item, index) => new { item, index })
+                .First(x => x.item is Key k && ReferenceEquals(k, _key))
+                .index;
+
+            whereKeyGoes.MoveItemFrom(LocalInventory, keyIndex);
         }
 
         private readonly Key _key;
